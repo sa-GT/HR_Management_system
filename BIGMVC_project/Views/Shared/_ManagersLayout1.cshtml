@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="~/css/app.css">
+    <link rel="stylesheet" href="~/css/Father.css">
+    <link rel="stylesheet" href="~/css/style.css"> 
+    @RenderSection("style", required: false)
+</head>
+<body>
+        <section class="main container-fluid">
+            <div class="row">
+                <!-- start sidebar -->
+                <div class="col-12 col-lg-2 col-xl-2 sidebar vh-100">
+                    <div class="d-flex justify-content-between align-items-center py-2 mt-3">
+                        <div class="d-flex justify-content-center align-items-center">
+                            @* لوقو *@
+                            <span class="font-weight-bolder text-primary h4 mb-0">My Shop</span>
+                        </div>
+                        <button class="text-dark hide-sidebar-btn btn btn-light d-block d-lg-none">
+                            <i class="feather-x" style="font-size: 2rem;"></i>
+                        </button>
+                    </div>
+                    <div class="nav-menu">
+                        <ul>
+                            <li class="menu-item">
+                                <a href="/" class="menu-item-link">
+                                    <span>
+                                    <i data-feather="grid"></i>
+
+                                        Dashboard
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li class="menu-title">
+                                <span >Manage Item</span>
+                            </li>
+                            <li class="menu-item">
+                            <a asp-action="Addemployee" asp-controller="Manager" class="menu-item-link">
+                                    <span>
+                                    <i data-feather="user-plus"></i>
+                                        Add Employee
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a asp-controller="Manager" asp-action="LeavingR" class="menu-item-link">
+                                    <span>
+                                    <i data-feather="plus-circle"></i>
+                                        leaving or vecation Request
+                                    </span>
+                                </a>
+                            <a asp-controller="Manager" asp-action="Show_Employee" class="menu-item-link">
+                                <span>
+                                    <i data-feather="bar-chart-2"></i>
+                                    Evaluation
+                                </span>
+                            </a>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- end sidebar -->
+                <div class="col-12 col-lg-10 col-xl-10 content vh-100">
+                    <div class="row header mb-4">
+                        <div class="col-12 ">
+                            <div class="p-2 bg-primary d-flex justify-content-between align-items-center">
+                                <button class="text-light show-sidebar-btn btn btn-primary d-block d-lg-none">
+                                    <i class="feather-menu" style="font-size: 2rem;"></i>
+                                </button>
+                                <div class="dropdown">
+                                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img src="@Context.Session.GetString("img")" alt="AKK" class="user_image">
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#">Profile</a>
+                                        @* <a class="dropdown-item" href="#">Another action</a> *@
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" asp-controller="Manager" asp-action="contact">Logout</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- start content area -->
+                    <!-- start breadcrumb -->
+                <div>
+                    @RenderBody()
+                </div>
+                    <!-- end content area -->
+                </div>
+            </div>
+
+        </section>
+        <script src="~/js/jquary.js"></script>
+        @* <script src="https://unpkg.com/@popperjs/core@2"></script> *@
+        <script src="~/js/bundlemain.js"></script>
+        <script src="~/js/waypoint.js"></script>
+        <script src="~/js/app.js"></script>
+        @* <script> *@
+        @*     let category = ["phone","computer","TV"]; *@
+        @*     let subCategory = [ *@
+        @*         { *@
+        @*             name:"Samsung", *@
+        @*             category_id:0 *@
+        @*         }, *@
+        @*         { *@
+        @*             name:"Oppo", *@
+        @*             category_id:0 *@
+        @*         }, *@
+        @*         { *@
+        @*             name:"Mi", *@
+        @*             category_id:0 *@
+        @*         }, *@
+        @*         { *@
+        @*             name:"Hp", *@
+        @*             category_id:1 *@
+        @*         }, *@
+        @*         { *@
+        @*             name:"Acer", *@
+        @*             category_id:1 *@
+        @*         }, *@
+        @*         { *@
+        @*             name:"Fuji", *@
+        @*             category_id:2 *@
+        @*         }, *@
+        @*         { *@
+        @*             name:"LG", *@
+        @*             category_id:2 *@
+        @*         }, *@
+        @*     ]; *@
+        @*     category.map((c,index)=>( *@
+        @*         $("#c").append(`<option value=${index}>${c}</option`) *@
+        @*     )) *@
+        @*     subCategory.map((c)=>( *@
+        @*             $("#sc").append(`<option value=${c.category_id} dataset-category=${c.category_id}>${c.name}</option>`) *@
+        @*     )) *@
+        @*     $("#c").on("change",function(){ *@
+        @*         let categoryId = $(this).val(); *@
+        @*         $("#sc option").hide(); *@
+        @*         $(`[dataset-category=${categoryId}]`).show(); *@
+        @*     }) *@
+        @* </script> *@
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+    <script>
+        feather.replace(); 
+    </script>
+
+	@RenderSection("scripts", required: false)
+</body>
+</html>
