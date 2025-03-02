@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<h4>Please login based on your role </h4>
+<div style="display:flex; gap:50px">
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="~/Images/HR.jpg">
+        <div class="card-body">
+            <h5 class="card-title">HR</h5>
+            <a href="@Url.Action("HRLogin", "Login")" class="btn btn-primary">Login </a>
+
+        </div>
+
+    </div><div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="~/Images/Manager.jpg">
+        <div class="card-body">
+            <h5 class="card-title">Manager</h5>
+            <a href="@Url.Action("ManagerLogin", "Login")" class="btn btn-primary">Login </a>
+
+        </div>
+
+    </div><div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="~/Images/manger.jpg">
+        <div class="card-body">
+            <h5 class="card-title">Employee</h5>
+
+            <a href="@Url.Action("EmployeeLogin", "Login")" class="btn btn-primary">Login </a>
+        </div>
+    </div>
+</div>

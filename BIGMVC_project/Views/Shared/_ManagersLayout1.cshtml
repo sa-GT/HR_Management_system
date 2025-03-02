@@ -61,7 +61,7 @@
                             <a asp-controller="Manager" asp-action="Show_Employee" class="menu-item-link">
                                 <span>
                                     <i data-feather="bar-chart-2"></i>
-                                    Evaluation
+                                    Employee_data
                                 </span>
                             </a>
 
@@ -79,20 +79,18 @@
                                 </button>
                                 <div class="dropdown">
                                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <img src="@Context.Session.GetString("img")" alt="AKK" class="user_image">
+                                    <img src="@Context.Session.GetString("IImg")" alt="AKK" class="user_image">
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#">Profile</a>
+                                    <a class="dropdown-item" asp-controller="Manager" asp-action="Profile">Profile</a>
                                         @* <a class="dropdown-item" href="#">Another action</a> *@
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" asp-controller="Manager" asp-action="contact">Logout</a>
+                                        <a class="dropdown-item"  asp-controller="Manager" asp-action="contact">Logout</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- start content area -->
-                    <!-- start breadcrumb -->
                 <div>
                     @RenderBody()
                 </div>

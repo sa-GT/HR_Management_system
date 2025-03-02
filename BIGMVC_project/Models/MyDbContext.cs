@@ -46,6 +46,7 @@ public partial class MyDbContext : DbContext
             entity.ToTable("Attendance");
 
             entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
             entity.Property(e => e.PunchIn).HasColumnType("datetime");
             entity.Property(e => e.PunchOut).HasColumnType("datetime");
@@ -150,6 +151,7 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.ReplyMessage).IsUnicode(false);
             entity.Property(e => e.SubmittedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");

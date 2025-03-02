@@ -1,0 +1,23 @@
+﻿@model Manager
+
+<link href="/css/Profile.css" rel="stylesheet" />
+
+<div class="container">
+    <div class="sidebar">
+         <img src="~/Images/@Model.Image" alt="Profile Picture">
+        <h2>@Model.Name</h2>
+
+    </div>
+    <div class="main-content">
+        <h1> My Profile</h1>
+        <div class="info">
+            <p><span>Full Name:</span>@Model.Name</p>
+            <p><span>Email:</span>@Model.Email</p>
+
+        </div>
+        <div class="buttons">
+            <button class="reset-btn">Reset Password</button>
+            <a asp-controller="Manager" asp-action="EditProfile" class="btn btn-primary">Edit Profile</a>
+        </div>
+    </div>
+</div>

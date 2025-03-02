@@ -19,8 +19,7 @@ namespace BIGMVC_project.Controllers
 		[HttpPost]
 		public IActionResult Login(Manager manager)
 		{
-			if (ModelState.IsValid)
-			{
+
 
 				var checc = _context.Managers
 					.FirstOrDefault(m => m.Email.ToLower() == manager.Email.ToLower()
@@ -28,17 +27,17 @@ namespace BIGMVC_project.Controllers
 
 				if (checc != null)
 				{
-					HttpContext.Session.SetString("img", checc.Image);
+					HttpContext.Session.SetString("IImg", checc.Image);
 					HttpContext.Session.SetString("Name", checc.Name);
 					HttpContext.Session.SetString("Email", checc.Email);
 					HttpContext.Session.SetInt32("Id", checc.Id);
-					return RedirectToAction("LeavingR", "Manager");
+					return RedirectToAction("Show_Employee", "Manager");
 				}
 				else
 				{
 					ModelState.AddModelError("", "Invalid Email or Password");
 				}
-			}
+			
 			return View();
 		}
 

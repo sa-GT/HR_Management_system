@@ -15,5 +15,7 @@ public partial class Attendance
 
     public DateTime? WorkingHours { get; set; }
 
+    public DateOnly? Date { get; set; }
+
     public virtual Employee Employee { get; set; } = null!;
 }

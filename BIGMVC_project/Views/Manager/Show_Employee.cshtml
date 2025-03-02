@@ -29,15 +29,8 @@
                 @Html.DisplayNameFor(model => model.Address)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Position)
+                Operation
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Department)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Manager)
-            </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -60,6 +53,9 @@
             </td>
             <td>
                     <a asp-controller="Manager" asp-action="Questions" asp-route-id="@item.Id" class="btn btn-success">Evaluation</a>
+                    <a asp-controller="Manager" asp-action="AssignTasks" asp-route-id="@item.Id" class="btn btn-primary">Assign Task</a>
+                    <a asp-controller="Manager" asp-action="EmployeeTasks" asp-route-id="@item.Id" class="btn btn-secondary">View_Tasks</a>
+                    <a asp-controller="Manager" asp-action="EmployeeAttendances" asp-route-id="@item.Id" class="btn btn-secondary">View Attendancs</a>
             </td>
         </tr>
 }

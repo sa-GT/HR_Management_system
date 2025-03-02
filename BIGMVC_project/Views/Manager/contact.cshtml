@@ -28,6 +28,16 @@
 
     <!-- Main CSS File -->
     <link href="~/css/main.css" rel="stylesheet">
+    <style>
+        #ss {
+            color: var(--contrast-color);
+            background: var(--accent-color);
+            border: 0;
+            padding: 10px 30px;
+            transition: 0.4s;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 
 <body class="index-page">
@@ -52,7 +62,7 @@
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
 
-            <a asp-controller="Sondos" asp-action="Login">Get Started</a>
+            <button asp-controller="Sondos" asp-action="Login" id="ss" class="cta-btn">Login</button>
 
         </div>
     </header>

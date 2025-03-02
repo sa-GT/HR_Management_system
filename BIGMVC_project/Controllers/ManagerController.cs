@@ -1,6 +1,7 @@
 ﻿using BIGMVC_project.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace BIGMVC_project.Controllers
 {
@@ -13,7 +14,20 @@ namespace BIGMVC_project.Controllers
 		}
 		public IActionResult Index()
 		{
-			return View();
+			var managerId = HttpContext.Session.GetString("ID");
+
+			if (managerId == null)
+			{
+				return RedirectToAction("Login");
+			}
+
+			int managerIdInt = int.Parse(managerId);
+			Console.WriteLine("Manager ID: " + managerIdInt);
+
+			var employees = _context.Employees.Where(e => e.ManagerId == managerIdInt).ToList();
+
+			ViewBag.Employees = employees;
+			return View(employees);
 		}
 		public IActionResult Addemployee()
 		{
@@ -71,15 +85,18 @@ namespace BIGMVC_project.Controllers
 		public IActionResult Show_Employee()
 		{
 			var idd = HttpContext.Session.GetInt32("Id");
+			HttpContext.Session.GetString("img");
 			var getemp = _context.Employees.Where(e => e.Id == idd).ToList();
+			ViewBag.Employees = getemp;
 			return View(getemp);
 		}
 		public IActionResult Questions()
 		{
 			return View();
 		}
+		//contact هي نفسها صفحه الهووووممممممممممممممممممممممممممممممممم
 		[HttpPost]
-		public IActionResult Questions(IFormCollection form, int id)
+		public IActionResult Questions(IFormCollection form,Evaluation ev, int id)
 		{
 			// Process the form data
 			int q1 = int.Parse(form["q1"]);
@@ -94,7 +111,7 @@ namespace BIGMVC_project.Controllers
 			int q10 = int.Parse(form["q10"]);
 
 			int totalScore = q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10;
-			totalScore = Math.Max(0, Math.Min(10, totalScore));
+			//totalScore = Math.Max(0, Math.Min(10, totalScore));
 
 			// Determine evaluation result
 			string result;
@@ -112,11 +129,17 @@ namespace BIGMVC_project.Controllers
 			}
 
 			// Update the evaluation result in the database
-			var updateEvaluation = _context.Evaluations.Find(id);
-			if (updateEvaluation != null)
+			
+
+			if (result != null)
 			{
-				updateEvaluation.EvaluationsStatusEnum = result; // Assuming the column name is "EvaluationResult"
-				_context.Evaluations.Update(updateEvaluation);
+				ev.Id = 0;
+				ev.EmployeeId = id;
+				ev.ManagerId = 1;
+				ev.EvaluationsStatusEnum = result;
+				//ev.DateEvaluated = DateTime.Today();
+		 // Assuming the column name is "EvaluationResult"
+				_context.Evaluations.Add(ev);
 				_context.SaveChanges();
 			}
 
@@ -124,6 +147,138 @@ namespace BIGMVC_project.Controllers
 			ViewBag.TotalScore = totalScore;
 
 			return View("Addemployee");
+		}
+		public IActionResult AssignTasks()
+		{
+			return View();
+		}
+		[HttpPost]
+		public IActionResult AssignTasks(int id)
+		{
+			var employee = _context.Employees.FirstOrDefault(e => e.Id == id);
+
+			if (employee == null)
+			{
+				// إذا لم يتم العثور على الموظف، يمكنك إعادة التوجيه أو عرض رسالة خطأ
+				return RedirectToAction("Index");
+			}
+			HttpContext.Session.SetInt32("idemp", employee.Id);
+			HttpContext.Session.SetString("nameemp",employee.Name);
+			// إرسال معلومات الموظف إلى الصفحة
+			//TempData["Employee"] = employee;
+			return View();
+		}
+
+
+		[HttpPost]
+		public IActionResult CreateTask(Mission task, int EmployeeId)
+		{
+			var employee = _context.Employees.FirstOrDefault(e => e.Id == EmployeeId);
+
+			if (employee == null)
+			{
+				ModelState.AddModelError("", "Invalid EmployeeId.");
+				return View("AssignTasks");
+			}
+
+			task.EmployeeId = EmployeeId;  // تعيين EmployeeId للمهمة
+			_context.Add(task);
+			_context.SaveChanges();
+
+			return RedirectToAction("Index");
+		}
+
+
+		[HttpGet]
+		public IActionResult EmployeeTasks(int id) // غيرت EmployeeId لـ id عشان يتماشى مع الرابط
+		{
+			var employee = _context.Employees.FirstOrDefault(e => e.Id == id);
+
+			if (employee == null)
+			{
+				return RedirectToAction("Index");
+			}
+
+			var tasks = _context.Missions.Where(t => t.EmployeeId == id).ToList();
+
+			ViewBag.Employee = employee;
+			return View(tasks);
+		}
+
+
+		[HttpGet]
+		public IActionResult EmployeeAttendances(int id) // غيرت EmployeeId لـ id عشان يتماشى مع الرابط
+		{
+			var employee = _context.Employees.FirstOrDefault(e => e.Id == id);
+
+			if (employee == null)
+			{
+				return RedirectToAction("Index");
+			}
+
+			var Attendancs = _context.Attendances.Where(t => t.EmployeeId == id).ToList();
+
+			ViewBag.Employee = employee;
+			return View(Attendancs);
+		}
+		public IActionResult Profile()
+		{
+			var idds = HttpContext.Session.GetInt32("Id");
+			var emailM = HttpContext.Session.GetString("Email");
+			var manager = _context.Managers.Find(idds);
+			return View(manager);
+		}
+		public IActionResult EditProfile()
+		{
+			var emailM = HttpContext.Session.GetString("Email");
+			if (string.IsNullOrEmpty(emailM))
+			{
+				return RedirectToAction("Profile", "Manager");
+			}
+
+			var manager = _context.Managers.FirstOrDefault(x => x.Email == emailM);
+			if (manager == null)
+			{
+				return RedirectToAction("Login", "Manager");
+			}
+
+			return View(manager);
+		}
+		[HttpPost]
+		public IActionResult HandleEditProfile(Manager m, IFormFile ImageFile)
+		{
+			var emailM = HttpContext.Session.GetString("Email");
+			var existingManager = _context.Managers.FirstOrDefault(x => x.Email == emailM);
+
+			if (existingManager != null)
+			{
+				// تحديث البيانات مع الحفاظ على القيم الحالية إذا لم يتم إدخال قيم جديدة
+				existingManager.Name = m.Name ?? existingManager.Name;
+				existingManager.Email = m.Email ?? existingManager.Email;
+				existingManager.PasswordHash = m.PasswordHash ?? existingManager.PasswordHash;
+
+				// التعامل مع الصورة الشخصية
+				if (ImageFile != null)
+				{
+					string fileName = Path.GetFileName(ImageFile.FileName);
+					string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images", fileName);
+
+					using (var stream = new FileStream(path, FileMode.Create))
+					{
+						ImageFile.CopyTo(stream);
+					}
+					existingManager.Image = fileName;
+					//m.Image = fileName;
+					HttpContext.Session.SetString("Img", existingManager.Image);
+				}
+
+				_context.Managers.Update(existingManager);
+				_context.SaveChanges();
+
+				return RedirectToAction("Show_Employee", "Manager");
+			}
+
+			return RedirectToAction("Login", "Manager");
 		}
 
 	}

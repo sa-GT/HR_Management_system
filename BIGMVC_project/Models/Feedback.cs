@@ -14,4 +14,6 @@ public partial class Feedback
     public string? Message { get; set; }
 
     public DateTime? SubmittedAt { get; set; }
+
+    public string? ReplyMessage { get; set; }
 }

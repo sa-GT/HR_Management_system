@@ -1,0 +1,69 @@
+﻿@model IEnumerable<Evaluation>
+
+@{
+	ViewData["Title"] = "Evaluation";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+	body {
+		background-color: white;
+	}
+</style>
+<h1 style="color:black">Evaluations</h1>
+
+<hr />
+
+<a asp-action="EvaluationToPDF" asp-controller="Hrs" class="btn btn-primary">
+	Download PDF
+</a>
+
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.Employee)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Manager)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.EvaluationsStatusEnum)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Comments)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.DateEvaluated)
+			</th>
+
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Employee.Name)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Manager.Name)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.EvaluationsStatusEnum)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Comments)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.DateEvaluated)
+				</td>
+
+				<td>
+					<a asp-action="EvaluationDetails" asp-route-id="@item.Id">Details</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

@@ -1,4 +1,5 @@
 using BIGMVC_project.Models;
+using BIGMVC_project.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BIGMVC_project
@@ -22,6 +23,7 @@ namespace BIGMVC_project
 				options.Cookie.HttpOnly = true;
 				options.Cookie.IsEssential = true;
 			});
+			builder.Services.AddScoped<EmailService>();
 			var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BIGMVC_project.Models;
 
@@ -17,7 +18,10 @@ public partial class Manager
 
     public string? Image { get; set; }
 
-    public virtual Department? Department { get; set; }
+    [NotMapped]
+    public string? ProfileImageFile { get; set; }
+
+	public virtual Department? Department { get; set; }
 
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
