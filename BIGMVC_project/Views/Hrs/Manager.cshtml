@@ -39,12 +39,10 @@
 
 <h1 style="color:black;">Managers List</h1>
 
-<p>
-    <a asp-action="AddManager" class="btn btn-primary">Create New</a>
-</p>
+
 
 <hr />
-
+<a asp-action="AddManager" class="btn btn-primary">Create New</a>
 <a asp-action="ManagerToPDF" asp-controller="Hrs" class="btn btn-primary">Download PDF</a>
 
 <div class="card-container">
@@ -57,14 +55,15 @@
             <div class="card-details">
                 <p><strong>Email:</strong> @Html.DisplayFor(modelItem => item.Email)</p>
                 <p><strong>Department:</strong> @Html.DisplayFor(modelItem => item.Department.Name)</p>
-                <a asp-action="ManagerDetails" asp-route-id="@item.Id" class="btn btn-info">Details</a>
             </div>
         </div>
     }
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function toggleCard(card) {
+        $(card).find('.card-details').slideToggle(300);
         card.classList.toggle('expanded');
     }
 </script>

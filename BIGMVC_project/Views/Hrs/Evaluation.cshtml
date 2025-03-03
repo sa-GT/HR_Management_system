@@ -4,66 +4,44 @@
 	ViewData["Title"] = "Evaluation";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<style>
-	body {
-		background-color: white;
-	}
-</style>
-<h1 style="color:black">Evaluations</h1>
+<h1 style="color:black;">Evaluations</h1>
 
 <hr />
 
 <a asp-action="EvaluationToPDF" asp-controller="Hrs" class="btn btn-primary">
-	Download PDF
+    Download PDF
 </a>
 
+<div class="card-container mt-3">
+    @foreach (var item in Model)
+    {
+        <div class="card" onclick="toggleCard(this)" style="border: 1px solid #ddd; border-radius: 8px; margin: 10px; padding: 15px; cursor: pointer; transition: box-shadow 0.3s ease;">
+            <div class="card-header" style="font-weight: bold; font-size: 18px;">
+                <strong>@item.Employee.Name</strong> - <em>@item.DateEvaluated.ToString()</em>
+            </div>
+            <div class="card-details" style="overflow: hidden; height: 0; transition: height 0.5s ease; margin-top: 10px; opacity: 0;">
+                <p><strong>Status:</strong> @item.EvaluationsStatusEnum</p>
+                <p><strong>Comments:</strong> @item.Comments</p>
+                <p><strong>Date Evaluated:</strong> @item.DateEvaluated.ToString()</p>
+                <a asp-action="EvaluationDetails" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+            </div>
+        </div>
+    }
+</div>
 
-<table class="table">
-	<thead>
-		<tr>
-			<th>
-				@Html.DisplayNameFor(model => model.Employee)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.Manager)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.EvaluationsStatusEnum)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.Comments)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.DateEvaluated)
-			</th>
+<script>
+    function toggleCard(card) {
+        card.classList.toggle('expanded');
+        let details = card.querySelector('.card-details');
 
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var item in Model)
-		{
-			<tr>
-				<td>
-					@Html.DisplayFor(modelItem => item.Employee.Name)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.Manager.Name)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.EvaluationsStatusEnum)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.Comments)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.DateEvaluated)
-				</td>
-
-				<td>
-					<a asp-action="EvaluationDetails" asp-route-id="@item.Id">Details</a>
-				</td>
-			</tr>
-		}
-	</tbody>
-</table>
+        if (card.classList.contains('expanded')) {
+            // Set height to auto and opacity to 1 to show the content smoothly
+            details.style.height = details.scrollHeight + "px";
+            details.style.opacity = 1;
+        } else {
+            // Collapse the card smoothly
+            details.style.height = "0";
+            details.style.opacity = 0;
+        }
+    }
+</script>
