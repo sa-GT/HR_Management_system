@@ -73,7 +73,7 @@
         <hr>
         @{
             var lastPunchIn = Model.LastOrDefault()?.PunchIn;
-            var disablePunchInButton = lastPunchIn.HasValue && (DateTime.Now - lastPunchIn.Value).TotalHours < 0;
+            var disablePunchInButton = lastPunchIn.HasValue && (DateTime.Now - lastPunchIn.Value).TotalHours < 1;
         }
 
        <form method="post" asp-action="PunchIn">
