@@ -5,6 +5,7 @@ Overview
 The HR Management System is a web-based application designed to manage employee data, departments, and performance evaluations efficiently. It supports three user roles: Employees, Managers, and HR.
 
 
+-------------------
 Features:
 
 -Role-based user authentication.
@@ -18,6 +19,9 @@ Features:
 -PDF report generation.
 
 
+
+
+-------------------
 Technologies Used:
 
 -ASP.NET Core MVC
