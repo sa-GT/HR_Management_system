@@ -44,7 +44,7 @@ namespace BIGMVC_project
 
 			app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=User1}/{action=Login}/{id?}");
+                pattern: "{controller=Manager}/{action=contact}/{id?}");
 
             app.Run();
         }

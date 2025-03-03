@@ -58,7 +58,7 @@ namespace BIGMVC_project.Controllers
 			HttpContext.Session.SetString("HrEmail", hr.Email ?? "");
 			HttpContext.Session.SetString("HrImage", hr.Image ?? "");
 
-			return RedirectToAction("Index", "HrDashboard");
+			return RedirectToAction("Dashboard", "Hrs");
 		}
 
 
@@ -92,7 +92,7 @@ namespace BIGMVC_project.Controllers
 			HttpContext.Session.SetInt32("ManagerDepartmentID", manager.DepartmentId ?? 0); // التعامل مع null
 			HttpContext.Session.SetString("ManagerImage", manager.Image ?? "");
 
-			return RedirectToAction("Index", "ManagerDashboard");
+			return RedirectToAction("Show_Employee", "Manager");
 		}
 
 
@@ -131,7 +131,7 @@ namespace BIGMVC_project.Controllers
 			if (employee.DepartmentId.HasValue)
 				HttpContext.Session.SetInt32("DepartmentID", employee.DepartmentId.Value);
 
-			return RedirectToAction("Index", "EmployeeDashboard");
+			return RedirectToAction("Index", "EmployeeAttend");
 		}
 
 		public IActionResult Logout()

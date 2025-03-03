@@ -14,10 +14,10 @@ namespace BIGMVC_project.Controllers
 		}
 		public IActionResult Index()
 		{
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 			if (employeeId == null)
 			{
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 			var attendance = _context.Attendances.Where(a => a.EmployeeId == employeeId).ToList();
@@ -27,13 +27,13 @@ namespace BIGMVC_project.Controllers
 		[HttpPost]
 		public IActionResult PunchIn()
 		{
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 
 			var employee = _context.Employees.Find(employeeId); // check if the id in session are same in DB
 
 			if (employee == null)
 			{
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 
@@ -51,7 +51,7 @@ namespace BIGMVC_project.Controllers
 
 		public IActionResult PunchOut(int attendanceId)
 		{
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 
 			var attendance = _context.Attendances.Find(attendanceId);
 
@@ -61,11 +61,11 @@ namespace BIGMVC_project.Controllers
 				_context.Update(attendance);
 				_context.SaveChanges();
 			}
-			return RedirectToAction("Index");
+			return RedirectToAction("Index", "EmployeeAttend");
 		}
 		public IActionResult LeaveRequest()
 		{
-			var employeeName = HttpContext.Session.GetString("name");
+			var employeeName = HttpContext.Session.GetString("EmployeeName");
 			ViewBag.EmployeeName = employeeName;
 
 			var leaveRequest = new LeaveRequest(); // Initialize a new leave request
@@ -76,13 +76,13 @@ namespace BIGMVC_project.Controllers
 		public async Task<IActionResult> SubmitLeaveRequest(LeaveRequest leaveRequest)
 		{
 			// Retrieve the logged-in employee's ID from the session
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 
 
 			if (employeeId == null)
 			{
 				TempData["Message"] = "Session expired. Please log in again.";
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 			// Set default values for the request
@@ -103,18 +103,18 @@ namespace BIGMVC_project.Controllers
 			_context.LeaveRequests.Add(leaveRequest);
 			await _context.SaveChangesAsync();
 
-			return RedirectToAction("EmployeeLeaveRequests");
+			return RedirectToAction("EmployeeLeaveRequests", "EmployeeAttend");
 
 
 		}
 		public IActionResult EmployeeLeaveRequests()
 		{
 			// Retrieve the logged-in employee's ID from the session
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 
 			if (employeeId == null)
 			{
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 			// Get the leave requests for the logged-in employee
@@ -125,10 +125,10 @@ namespace BIGMVC_project.Controllers
 		public IActionResult ViewTasks()
 		{
 			// Retrieve the logged-in employee's ID from the session
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
-
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
+			var findd = _context.Missions.Find(employeeId);
 			// Fetch tasks for the static EmployeeId
-			var tasks = _context.Missions.Where(m => m.EmployeeId == employeeId) // Filter tasks by the logged-in employee's ID
+			var tasks = _context.Missions.Where(m => m.EmployeeId == findd.EmployeeId) // Filter tasks by the logged-in employee's ID
 				.OrderBy(m => m.StartDate)
 				.ToList();
 
@@ -156,7 +156,7 @@ namespace BIGMVC_project.Controllers
 				return NotFound("Task not found.");
 			}
 			// Retrieve the logged-in employee's ID from the session
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 
 
 			// Update the task status
@@ -165,17 +165,17 @@ namespace BIGMVC_project.Controllers
 			await _context.SaveChangesAsync();
 
 			// Redirect back to the ViewTasks page
-			return RedirectToAction("ViewTasks");
+			return RedirectToAction("ViewTasks", "EmployeeAttend");
 		}
 		public IActionResult Profile()
 		{
 			// Retrieve the logged-in employee's ID from the session
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 
 			if (employeeId == null)
 			{
 				TempData["Message"] = "Session expired. Please log in again.";
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 
@@ -189,7 +189,7 @@ namespace BIGMVC_project.Controllers
 			if (employee == null)
 			{
 				TempData["Message"] = "Employee not found.";
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 			return View(employee);
@@ -198,12 +198,12 @@ namespace BIGMVC_project.Controllers
 		public IActionResult EditProfile()
 		{
 			// Retrieve the logged-in employee's ID from the session
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
 
 			if (employeeId == null)
 			{
 				TempData["Message"] = "Session expired. Please log in again.";
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 			// Fetch the employee's details from the database
@@ -212,7 +212,7 @@ namespace BIGMVC_project.Controllers
 			if (employee == null)
 			{
 				TempData["Message"] = "Employee not found.";
-				return RedirectToAction("Login");
+				return RedirectToAction("EmployeeLogin", "Login");
 			}
 
 			return View(employee);
@@ -272,9 +272,14 @@ namespace BIGMVC_project.Controllers
 		}
 		public IActionResult Evaluation()
 		{
-			var employeeId = HttpContext.Session.GetInt32("EmployeeId");
+			var employeeId = HttpContext.Session.GetInt32("EmployeeID");
+
+			//var findd = _context.Evaluations.Find(employeeId);
 
 			var emp = _context.Evaluations.FirstOrDefault(e => e.EmployeeId == employeeId);
+
+
+		
 			return View(emp);
 		}
 		public IActionResult Dashboard()
@@ -284,44 +289,10 @@ namespace BIGMVC_project.Controllers
 		public IActionResult Logout()
 		{
 			HttpContext.Session.Clear();
-			return RedirectToAction("Login");
-		}
-		public IActionResult Login()
-		{
-			return RedirectToAction("EmployeeLogin","Login"); ;
+			return RedirectToAction("EmployeeLogin", "Login");
 		}
 
 
-		[HttpPost]
-		public IActionResult HandleLogin(string email, string password)
-		{
-			var employee = _context.Employees.FirstOrDefault(x => x.Email == email && x.PasswordHash == password);
-
-			if (employee != null)
-			{
-				HttpContext.Session.SetString("email", email);
-				HttpContext.Session.SetString("password", password);
-				HttpContext.Session.SetString("name", employee.Name);
-				HttpContext.Session.SetString("ProfileImage", employee.ImagePath);
-				HttpContext.Session.SetInt32("EmployeeId", employee.Id); // Store EmployeeId in session
-
-			}
-
-			var SessionEmail = HttpContext.Session.GetString("email");
-			var SessionPssword = HttpContext.Session.GetString("password");
-
-
-
-			if (SessionPssword == password && SessionEmail == email)
-			{
-				return RedirectToAction("Index");
-			}
-			else
-			{
-				return RedirectToAction("Login");
-
-			}
-
-		}
 	}
 }
+

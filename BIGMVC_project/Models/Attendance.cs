@@ -9,7 +9,7 @@ public partial class Attendance
 
     public int EmployeeId { get; set; }
 
-    public DateTime PunchIn { get; set; }
+    public DateTime? PunchIn { get; set; }
 
     public DateTime? PunchOut { get; set; }
 

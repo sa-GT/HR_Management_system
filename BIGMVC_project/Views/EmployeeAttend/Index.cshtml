@@ -1,11 +1,13 @@
-﻿
-@model IEnumerable<BIGMVC_project.Models.Attendance> // data that will show in the page 
+﻿@model IEnumerable<BIGMVC_project.Models.Attendance> // data that will show in the page 
 
 
 @{
     ViewData["Title"] = "View";
     Layout = "~/Views/Shared/_LayoutGen.cshtml";
 }
+
+
+
 <div class="wrapper">
 
 
@@ -30,19 +32,19 @@
                         <td>@item.PunchIn</td>
                         <td>@item.PunchOut</td>
                         <td>
-                            @* @if (item.PunchIn.HasValue && item.PunchOut.HasValue) *@
-                            @* { *@
-                            @*     var totalMinutes = (item.PunchOut.Value - item.PunchIn.Value).TotalMinutes; *@
-                            @*     if (totalMinutes < 60) *@
-                            @*     { *@
-                            @*         @Math.Round(totalMinutes, 2) <span> mins</span> *@
-                            @*     } *@
-                            @*     else *@
-                            @*     { *@
-                            @*         var totalHours = totalMinutes / 60; *@
-                            @*         @Math.Round(totalHours, 2) <span> hrs</span> *@
-                            @*     } *@
-                            @* } *@
+                             @if (item.PunchIn.HasValue && item.PunchOut.HasValue) 
+                             {
+                                 var totalMinutes = (item.PunchOut.Value - item.PunchIn.Value).TotalMinutes; 
+                                 if (totalMinutes < 60) 
+                                 { 
+                                     @Math.Round(totalMinutes, 2) <span> mins</span> 
+                                } 
+                                else 
+                                { 
+                                    var totalHours = totalMinutes / 60; 
+                                     @Math.Round(totalHours, 2) <span> hrs</span> 
+                                } 
+                            }
                             else
                             {
                                 <span>Not Available</span>
@@ -58,7 +60,7 @@
                             }
                             else
                             {
-                                <button style="color: black" class="btn btn-danger" disabled>Punch Out</button>
+                                <button style="color: black" class="btn btn-danger disabled-button" disabled>Punch Out</button>
                             }
                         </td>
 
@@ -71,12 +73,13 @@
         <hr>
         @{
             var lastPunchIn = Model.LastOrDefault()?.PunchIn;
-            var disablePunchInButton = lastPunchIn.HasValue && (DateTime.Now - lastPunchIn.Value).TotalHours < 1;
+            var disablePunchInButton = lastPunchIn.HasValue && (DateTime.Now - lastPunchIn.Value).TotalHours < 0;
         }
 
-        <form method="post" asp-action="PunchIn">
-            <button type="submit" class="btn btn-success" @(disablePunchInButton ? "disabled" : "")>Punch In</button>
-        </form>
+       <form method="post" asp-action="PunchIn">
+    <button type="submit" class="btn btn-success @(disablePunchInButton ? "disabled-button" : "")" @(disablePunchInButton ? "disabled" : "")>Punch In</button>
+</form>
+
     </div>
 
-</div
+</div>

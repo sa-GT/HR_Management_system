@@ -12,12 +12,15 @@ body {
 }
 
 .container {
-    display: flex;
+    /* display: flex
+; */
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     width: 800px;
+    margin-top: 51px !important;
+    padding: 33px !important;
 }
 
 .sidebar {

@@ -41,11 +41,13 @@ namespace HR_Management.Controllers
 			return View(allLeaveRequests);
 		}
 
-		public IActionResult Feedback() // there is an error here replay message was not found
+		public IActionResult Feedback()
 		{
-			var feedback = _context.Feedbacks.ToList();
-			return View(feedback);
+			var feedbackList = _context.Feedbacks.ToList();
+			return View(feedbackList);
 		}
+
+
 		[HttpPost]
 		public async Task<IActionResult> SubmitFeedback(Feedback feedback)
 		{
@@ -54,12 +56,13 @@ namespace HR_Management.Controllers
 				feedback.SubmittedAt = DateTime.Now;
 				_context.Feedbacks.Add(feedback);
 				await _context.SaveChangesAsync();
-				TempData["Success"] = "Your feedback has been submitted!";
+				TempData["Success"] = "Success!";
 				return RedirectToAction("Feedback");
 			}
 
 			return View("Feedback", feedback);
 		}
+
 
 		[HttpPost]
 		public async Task<IActionResult> DeleteFeedback(int id)
@@ -73,25 +76,31 @@ namespace HR_Management.Controllers
 
 			return RedirectToAction("Feedback");
 		}
+
+
 		[HttpPost]
-		public IActionResult ReplyToFeedback(int id, string reply)
+		public async Task<IActionResult> ReplyToFeedback(int id, string reply)
 		{
-			var feedback = _context.Feedbacks.Find(id);
+			var feedback = await _context.Feedbacks.FindAsync(id);
 			if (feedback == null)
 			{
 				return NotFound();
 			}
 
-			//feedback.ReplyMessage = reply;
-			_context.SaveChanges();
+			feedback.ReplyMessage = reply;
+			_context.Feedbacks.Update(feedback);
+			await _context.SaveChangesAsync();
 
+			TempData["Success"] = "Success!";
 			return RedirectToAction("Feedback");
 		}
 
+
 		//public IActionResult ContactUs()
 		//{
-		//	return View(new Feedback());
+		//    return View(new Feedback());
 		//}
+
 
 		[HttpPost]
 		public IActionResult SendFeedback(Feedback feedback)

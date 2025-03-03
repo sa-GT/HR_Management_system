@@ -1,6 +1,8 @@
 ﻿using BIGMVC_project.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Sockets;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace BIGMVC_project.Controllers
@@ -12,22 +14,47 @@ namespace BIGMVC_project.Controllers
 		{
 			_context = context;
 		}
+
+		public string GetLocalIPAddress()
+		{
+			var host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (var ip in host.AddressList)
+			{
+				if (ip.AddressFamily == AddressFamily.InterNetwork) // IPv4 
+				{
+					return ip.ToString();
+				}
+			}
+			return "127.0.0.1";
+		}
+
+
 		public IActionResult Index()
 		{
-			var managerId = HttpContext.Session.GetString("ID");
+			string userIp = GetLocalIPAddress();
 
-			if (managerId == null)
+			Console.WriteLine($"User Local IP: {userIp}");
+
+			if (userIp == "192.168.1.13")
 			{
-				return RedirectToAction("Login");
+				var managerId = HttpContext.Session.GetString("ID");
+
+				if (managerId == null)
+				{
+					return RedirectToAction("Login");
+				}
+
+				int managerIdInt = int.Parse(managerId);
+				Console.WriteLine("Manager ID: " + managerIdInt);
+
+				var employees = _context.Employees.Where(e => e.ManagerId == managerIdInt).ToList();
+
+				ViewBag.Employees = employees;
+				return View(employees);
 			}
 
-			int managerIdInt = int.Parse(managerId);
-			Console.WriteLine("Manager ID: " + managerIdInt);
-
-			var employees = _context.Employees.Where(e => e.ManagerId == managerIdInt).ToList();
-
-			ViewBag.Employees = employees;
-			return View(employees);
+			return Json(new { success = false, message = $"You are NOT on the company network! Your Local IP: {userIp}" });
+			
 		}
 		public IActionResult Addemployee()
 		{
@@ -84,9 +111,9 @@ namespace BIGMVC_project.Controllers
 		}
 		public IActionResult Show_Employee()
 		{
-			var idd = HttpContext.Session.GetInt32("Id");
+			var idd = HttpContext.Session.GetInt32("ManagerID");
 			HttpContext.Session.GetString("img");
-			var getemp = _context.Employees.Where(e => e.Id == idd).ToList();
+			var getemp = _context.Employees.Where(e => e.ManagerId == idd).ToList();
 			ViewBag.Employees = getemp;
 			return View(getemp);
 		}
@@ -148,8 +175,11 @@ namespace BIGMVC_project.Controllers
 
 			return View("Addemployee");
 		}
-		public IActionResult AssignTasks()
+		public IActionResult AssignTasks(int id, int a)
 		{
+
+
+			HttpContext.Session.SetString("EmployeeName", _context.Employees.FirstOrDefault(x => x.Id == id).Name);
 			return View();
 		}
 		[HttpPost]
@@ -223,14 +253,14 @@ namespace BIGMVC_project.Controllers
 		}
 		public IActionResult Profile()
 		{
-			var idds = HttpContext.Session.GetInt32("Id");
+			var idds = HttpContext.Session.GetInt32("ManagerID");
 			var emailM = HttpContext.Session.GetString("Email");
 			var manager = _context.Managers.Find(idds);
 			return View(manager);
 		}
 		public IActionResult EditProfile()
 		{
-			var emailM = HttpContext.Session.GetString("Email");
+			var emailM = HttpContext.Session.GetString("ManagerEmail");
 			if (string.IsNullOrEmpty(emailM))
 			{
 				return RedirectToAction("Profile", "Manager");
@@ -247,7 +277,7 @@ namespace BIGMVC_project.Controllers
 		[HttpPost]
 		public IActionResult HandleEditProfile(Manager m, IFormFile ImageFile)
 		{
-			var emailM = HttpContext.Session.GetString("Email");
+			var emailM = HttpContext.Session.GetString("ManagerEmail");
 			var existingManager = _context.Managers.FirstOrDefault(x => x.Email == emailM);
 
 			if (existingManager != null)

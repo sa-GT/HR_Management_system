@@ -13,8 +13,12 @@
 
 
 <form asp-controller="Manager" asp-action="CreateTask" method="post">
-    <input type="hidden" name="EmployeeId" value="@employeeid" /> 
+    <input type="hidden" name="EmployeeId" value="@employeeid" />
 
+    <div class="form-group">
+        <label for="TaskName">Employee Name</label>
+        <input type="text" disabled class="form-control" value="@Context.Session.GetString("EmployeeName")"  />
+    </div>
     <div class="form-group">
         <label for="TaskName">Task Name</label>
         <input type="text" name="TaskName" class="form-control" required />

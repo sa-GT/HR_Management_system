@@ -1,9 +1,42 @@
 ﻿@model IEnumerable<Manager>
+
 <style>
     body {
         background-color: white;
     }
+
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.expanded {
+            background-color: #f9f9f9;
+        }
+
+    .card-header {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .card-details {
+        display: none;
+        margin-top: 10px;
+    }
+
+    .card.expanded .card-details {
+        display: block;
+    }
 </style>
+
 <h1 style="color:black;">Managers List</h1>
 
 <p>
@@ -14,37 +47,24 @@
 
 <a asp-action="ManagerToPDF" asp-controller="Hrs" class="btn btn-primary">Download PDF</a>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Department)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Department.Name)
-                </td>
-                <td>
-                    <a asp-action="ManagerDetails" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card-container">
+    @foreach (var item in Model)
+    {
+        <div class="card" onclick="toggleCard(this)">
+            <div class="card-header">
+                @Html.DisplayFor(modelItem => item.Name)
+            </div>
+            <div class="card-details">
+                <p><strong>Email:</strong> @Html.DisplayFor(modelItem => item.Email)</p>
+                <p><strong>Department:</strong> @Html.DisplayFor(modelItem => item.Department.Name)</p>
+                <a asp-action="ManagerDetails" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    function toggleCard(card) {
+        card.classList.toggle('expanded');
+    }
+</script>

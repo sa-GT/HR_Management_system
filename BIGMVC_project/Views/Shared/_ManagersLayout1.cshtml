@@ -1,159 +1,116 @@
 ﻿<!DOCTYPE html>
+<html lang="en">
 
-<html>
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="~/css/app.css">
-    <link rel="stylesheet" href="~/css/Father.css">
-    <link rel="stylesheet" href="~/css/style.css"> 
-    @RenderSection("style", required: false)
+	<meta charset="utf-8" />
+	<link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+	<link rel="icon" type="image/png" href="../assets/img/favicon.ico">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<title>Light Bootstrap Dashboard - Free Bootstrap 4 Admin Dashboard by Creative Tim</title>
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+
+	<!-- Fonts and icons -->
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+	<!-- CSS Files -->
+	<link href="~/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="~/css/light-bootstrap-dashboard.css?v=2.0.0" rel="stylesheet" />
+
+	<!-- Demo CSS (Just for demo purpose, don't include in your project) -->
+	<link href="../assets/css/demo.css" rel="stylesheet" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/now-ui-icons/1.0.1/css/now-ui-icons.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+
+	<script src="/lib/chart/chart.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+	@RenderSection("style", required: false)
+	<style>
+		/* body { */
+		/* 	margin: 0; */
+		/* 	font-family: "Open Sans", sans-serif; */
+		/* 	font-size: 1rem; */
+		/* 	font-weight: 400; */
+		/* 	line-height: 1.5; */
+		/* 	color: #6C7293; */
+		/* 	-webkit-text-size-adjust: 100%; */
+		/* 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0); */
+		/* } */
+	</style>
 </head>
+
 <body>
-        <section class="main container-fluid">
-            <div class="row">
-                <!-- start sidebar -->
-                <div class="col-12 col-lg-2 col-xl-2 sidebar vh-100">
-                    <div class="d-flex justify-content-between align-items-center py-2 mt-3">
-                        <div class="d-flex justify-content-center align-items-center">
-                            @* لوقو *@
-                            <span class="font-weight-bolder text-primary h4 mb-0">My Shop</span>
-                        </div>
-                        <button class="text-dark hide-sidebar-btn btn btn-light d-block d-lg-none">
-                            <i class="feather-x" style="font-size: 2rem;"></i>
-                        </button>
-                    </div>
-                    <div class="nav-menu">
-                        <ul>
-                            <li class="menu-item">
-                                <a href="/" class="menu-item-link">
-                                    <span>
-                                    <i data-feather="grid"></i>
+	<div class="wrapper">
+		<div class="sidebar" data-image="@Url.Content("~/img/sidebar-5.jpg")">
+			<div class="sidebar-wrapper">
+				<div class="logo">
+					<h1 class="sitename"><img src="~/image/HRoot_Logo-removebg-preview.png" style="max-height:46px !important" alt="Alternate Text" /></h1>
+				</div>
+				<ul class="nav">
+					<li>
+						<a class="nav-link" href="@Url.Action("Addemployee", "Manager")">
+							<i class="fa fa-user"></i>
+							<p>Add Employee</p>
+						</a>
+					</li>
+					<li>
+						<a class="nav-link" asp-action="LeavingR" asp-controller="Manager">
+							<i class="fa fa-table"></i>
+							<p>
+								Time-Off Request
+							</p>
+						</a>
+					</li>
+					<li>
+						<a class="nav-link" asp-action="Show_Employee" asp-controller="Manager">
+							<i class="fa fa-user"></i>
+							<p>Employee_data</p>
+						</a>
+					</li>
+					<li>
+						<a class="nav-link" asp-action="AssignTasks" asp-controller="Manager">
+							<i class="fa fa-user"></i>
+							<p>Assign_Task</p>
+						</a>
+					</li>
+					@* <li> *@
+					@* 	<a class="nav-link" asp-action="Profile" asp-controller="Manager"> *@
+					@* 		<i class="fa fa-user"></i> *@
+					@* 		<p>Profile</p> *@
+					@* 	</a> *@
+					@* </li> *@
+				</ul>
+			</div>
+		</div>
+		<div class="main-panel">
+			<!-- Navbar -->
+			<div class="container">
+				@RenderBody()
+				</main>
+			</div>
+		</div>
+		<!-- Content End -->
+	</div>
 
-                                        Dashboard
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul>
-                            <li class="menu-title">
-                                <span >Manage Item</span>
-                            </li>
-                            <li class="menu-item">
-                            <a asp-action="Addemployee" asp-controller="Manager" class="menu-item-link">
-                                    <span>
-                                    <i data-feather="user-plus"></i>
-                                        Add Employee
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a asp-controller="Manager" asp-action="LeavingR" class="menu-item-link">
-                                    <span>
-                                    <i data-feather="plus-circle"></i>
-                                        leaving or vecation Request
-                                    </span>
-                                </a>
-                            <a asp-controller="Manager" asp-action="Show_Employee" class="menu-item-link">
-                                <span>
-                                    <i data-feather="bar-chart-2"></i>
-                                    Employee_data
-                                </span>
-                            </a>
+	<!-- JS Files -->
+	<script src="../assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>
+	<script src="../assets/js/core/popper.min.js" type="text/javascript"></script>
+	<script src="../assets/js/core/bootstrap.min.js" type="text/javascript"></script>
+	<script src="../assets/js/plugins/bootstrap-switch.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+	<script src="../assets/js/plugins/chartist.min.js"></script>
+	<script src="../assets/js/plugins/bootstrap-notify.js"></script>
+	<script src="../assets/js/light-bootstrap-dashboard.js?v=2.0.0" type="text/javascript"></script>
+	<script src="../assets/js/demo.js"></script>
 
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- end sidebar -->
-                <div class="col-12 col-lg-10 col-xl-10 content vh-100">
-                    <div class="row header mb-4">
-                        <div class="col-12 ">
-                            <div class="p-2 bg-primary d-flex justify-content-between align-items-center">
-                                <button class="text-light show-sidebar-btn btn btn-primary d-block d-lg-none">
-                                    <i class="feather-menu" style="font-size: 2rem;"></i>
-                                </button>
-                                <div class="dropdown">
-                                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <img src="@Context.Session.GetString("IImg")" alt="AKK" class="user_image">
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item" asp-controller="Manager" asp-action="Profile">Profile</a>
-                                        @* <a class="dropdown-item" href="#">Another action</a> *@
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item"  asp-controller="Manager" asp-action="contact">Logout</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <div>
-                    @RenderBody()
-                </div>
-                    <!-- end content area -->
-                </div>
-            </div>
-
-        </section>
-        <script src="~/js/jquary.js"></script>
-        @* <script src="https://unpkg.com/@popperjs/core@2"></script> *@
-        <script src="~/js/bundlemain.js"></script>
-        <script src="~/js/waypoint.js"></script>
-        <script src="~/js/app.js"></script>
-        @* <script> *@
-        @*     let category = ["phone","computer","TV"]; *@
-        @*     let subCategory = [ *@
-        @*         { *@
-        @*             name:"Samsung", *@
-        @*             category_id:0 *@
-        @*         }, *@
-        @*         { *@
-        @*             name:"Oppo", *@
-        @*             category_id:0 *@
-        @*         }, *@
-        @*         { *@
-        @*             name:"Mi", *@
-        @*             category_id:0 *@
-        @*         }, *@
-        @*         { *@
-        @*             name:"Hp", *@
-        @*             category_id:1 *@
-        @*         }, *@
-        @*         { *@
-        @*             name:"Acer", *@
-        @*             category_id:1 *@
-        @*         }, *@
-        @*         { *@
-        @*             name:"Fuji", *@
-        @*             category_id:2 *@
-        @*         }, *@
-        @*         { *@
-        @*             name:"LG", *@
-        @*             category_id:2 *@
-        @*         }, *@
-        @*     ]; *@
-        @*     category.map((c,index)=>( *@
-        @*         $("#c").append(`<option value=${index}>${c}</option`) *@
-        @*     )) *@
-        @*     subCategory.map((c)=>( *@
-        @*             $("#sc").append(`<option value=${c.category_id} dataset-category=${c.category_id}>${c.name}</option>`) *@
-        @*     )) *@
-        @*     $("#c").on("change",function(){ *@
-        @*         let categoryId = $(this).val(); *@
-        @*         $("#sc option").hide(); *@
-        @*         $(`[dataset-category=${categoryId}]`).show(); *@
-        @*     }) *@
-        @* </script> *@
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
-    <script>
-        feather.replace(); 
-    </script>
-
-	@RenderSection("scripts", required: false)
+	<script type="text/javascript">
+		$(document).ready(function() {
+			demo.initDashboardPageCharts();
+			demo.showNotification();
+		});
+	</script>
+	@RenderSection("scripts", required: false);
 </body>
 </html>
