@@ -310,6 +310,11 @@ namespace BIGMVC_project.Controllers
 
 			return RedirectToAction("Login", "Manager");
 		}
+		public IActionResult Logout()
+		{
+			HttpContext.Session.Clear();
+			return RedirectToAction("Index", "Login");
+		}
 
 	}
 
