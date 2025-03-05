@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BIGMVC_project.Services;
+using System.Net.Sockets;
+using System.Net;
 //using BCrypt.Net;
 
 namespace BIGMVC_project.Controllers
@@ -31,35 +33,80 @@ namespace BIGMVC_project.Controllers
 
 		//-------HRLogin------
 
-
-		public ActionResult HRLogin()
+		public string GetLocalIPAddress()
 		{
-			return View();
+			var host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (var ip in host.AddressList)
+			{
+				if (ip.AddressFamily == AddressFamily.InterNetwork) // IPv4 
+				{
+					return ip.ToString();
+				}
+			}
+			return "127.0.0.1";
 		}
 		[HttpPost]
 		public async Task<IActionResult> HrLogin(Hr model)
 		{
-			if (!ModelState.IsValid)
-				return View(model);
+			string userIp = GetLocalIPAddress();
 
-			var hr = await _context.Hrs
-				.FirstOrDefaultAsync(h => h.Email == model.Email && h.PasswordHash == model.PasswordHash);
+			Console.WriteLine($"User Local IP: {userIp}");
 
-			if (hr == null)
+			if (userIp == "192.168.1.124")
 			{
-				ModelState.AddModelError("", "Invalid email or password");
-				return View(model);
+				if (!ModelState.IsValid)
+					return View(model);
+
+				var hr = await _context.Hrs
+					.FirstOrDefaultAsync(h => h.Email == model.Email && h.PasswordHash == model.PasswordHash);
+
+				if (hr == null)
+				{
+					ModelState.AddModelError("", "Invalid email or password");
+					return View(model);
+				}
+
+
+				HttpContext.Session.SetString("UserLoggedIn", "true");
+				HttpContext.Session.SetInt32("HrID", hr.Id);
+				HttpContext.Session.SetString("HrName", hr.Name ?? ""); // تجنب الخطأ إذا كانت null
+				HttpContext.Session.SetString("HrEmail", hr.Email ?? "");
+				HttpContext.Session.SetString("HrImage", hr.Image ?? "");
+
+				return RedirectToAction("Dashboard", "Hrs");
+				//return Json(new { success = true, message = $"You are connected. Your Local IP: {userIp}" });
 			}
 
-
-			HttpContext.Session.SetString("UserLoggedIn", "true");
-			HttpContext.Session.SetInt32("HrID", hr.Id);
-			HttpContext.Session.SetString("HrName", hr.Name ?? ""); // تجنب الخطأ إذا كانت null
-			HttpContext.Session.SetString("HrEmail", hr.Email ?? "");
-			HttpContext.Session.SetString("HrImage", hr.Image ?? "");
-
-			return RedirectToAction("Dashboard", "Hrs");
+			return Json(new { success = false, message = $"You are NOT on the company network! Your Local IP: {userIp}" });
 		}
+		public ActionResult HRLogin()
+		{
+			return View();
+		}
+		//[HttpPost]
+		//public async Task<IActionResult> HrLogin(Hr model)
+		//{
+		//	if (!ModelState.IsValid)
+		//		return View(model);
+
+		//	var hr = await _context.Hrs
+		//		.FirstOrDefaultAsync(h => h.Email == model.Email && h.PasswordHash == model.PasswordHash);
+
+		//	if (hr == null)
+		//	{
+		//		ModelState.AddModelError("", "Invalid email or password");
+		//		return View(model);
+		//	}
+
+
+		//	HttpContext.Session.SetString("UserLoggedIn", "true");
+		//	HttpContext.Session.SetInt32("HrID", hr.Id);
+		//	HttpContext.Session.SetString("HrName", hr.Name ?? ""); // تجنب الخطأ إذا كانت null
+		//	HttpContext.Session.SetString("HrEmail", hr.Email ?? "");
+		//	HttpContext.Session.SetString("HrImage", hr.Image ?? "");
+
+		//	return RedirectToAction("Dashboard", "Hrs");
+		//}
 
 
 		//-------ManagerLogin------
@@ -68,32 +115,67 @@ namespace BIGMVC_project.Controllers
 		{
 			return View();
 		}
-
 		[HttpPost]
 		public async Task<IActionResult> ManagerLogin(Manager model)
 		{
-			if (!ModelState.IsValid)
-				return View(model);
+			string userIp = GetLocalIPAddress();
 
-			var manager = await _context.Managers
-				.FirstOrDefaultAsync(m => m.Email == model.Email && m.PasswordHash == model.PasswordHash);
+			Console.WriteLine($"User Local IP: {userIp}");
 
-			if (manager == null)
+			if (userIp == "192.168.1.124")
 			{
-				ModelState.AddModelError("", "Invalid email or password");
-				return View(model);
+				if (!ModelState.IsValid)
+					return View(model);
+
+				var manager = await _context.Managers
+					.FirstOrDefaultAsync(m => m.Email == model.Email && m.PasswordHash == model.PasswordHash);
+
+				if (manager == null)
+				{
+					ModelState.AddModelError("", "Invalid email or password");
+					return View(model);
+				}
+
+
+				HttpContext.Session.SetString("UserLoggedIn", "true");
+				HttpContext.Session.SetInt32("ManagerID", manager.Id);
+				HttpContext.Session.SetString("ManagerName", manager.Name ?? "");
+				HttpContext.Session.SetString("ManagerEmail", manager.Email ?? "");
+				HttpContext.Session.SetInt32("ManagerDepartmentID", manager.DepartmentId ?? 0); // التعامل مع null
+				HttpContext.Session.SetString("ManagerImage", manager.Image ?? "");
+
+				return RedirectToAction("Show_Employee", "Manager");
+				//return Json(new { success = true, message = $"You are connected. Your Local IP: {userIp}" });
 			}
 
-
-			HttpContext.Session.SetString("UserLoggedIn", "true");
-			HttpContext.Session.SetInt32("ManagerID", manager.Id);
-			HttpContext.Session.SetString("ManagerName", manager.Name ?? "");
-			HttpContext.Session.SetString("ManagerEmail", manager.Email ?? "");
-			HttpContext.Session.SetInt32("ManagerDepartmentID", manager.DepartmentId ?? 0); // التعامل مع null
-			HttpContext.Session.SetString("ManagerImage", manager.Image ?? "");
-
-			return RedirectToAction("Show_Employee", "Manager");
+			return Json(new { success = false, message = $"You are NOT on the company network! Your Local IP: {userIp}" });
 		}
+
+		//[HttpPost]
+		//public async Task<IActionResult> ManagerLogin(Manager model)
+		//{
+		//	if (!ModelState.IsValid)
+		//		return View(model);
+
+		//	var manager = await _context.Managers
+		//		.FirstOrDefaultAsync(m => m.Email == model.Email && m.PasswordHash == model.PasswordHash);
+
+		//	if (manager == null)
+		//	{
+		//		ModelState.AddModelError("", "Invalid email or password");
+		//		return View(model);
+		//	}
+
+
+		//	HttpContext.Session.SetString("UserLoggedIn", "true");
+		//	HttpContext.Session.SetInt32("ManagerID", manager.Id);
+		//	HttpContext.Session.SetString("ManagerName", manager.Name ?? "");
+		//	HttpContext.Session.SetString("ManagerEmail", manager.Email ?? "");
+		//	HttpContext.Session.SetInt32("ManagerDepartmentID", manager.DepartmentId ?? 0); // التعامل مع null
+		//	HttpContext.Session.SetString("ManagerImage", manager.Image ?? "");
+
+		//	return RedirectToAction("Show_Employee", "Manager");
+		//}
 
 
 		//-------EmployeeLogin------
@@ -104,35 +186,77 @@ namespace BIGMVC_project.Controllers
 		[HttpPost]
 		public async Task<IActionResult> EmployeeLogin(Employee model)
 		{
-			if (!ModelState.IsValid)
-				return View(model);
+			string userIp = GetLocalIPAddress();
 
-			var employee = await _context.Employees
-				.FirstOrDefaultAsync(e => e.Email == model.Email && e.PasswordHash == model.PasswordHash);
+			Console.WriteLine($"User Local IP: {userIp}");
 
-			if (employee == null)
+			if (userIp == "192.168.1.124")
 			{
-				ModelState.AddModelError("", "Invalid email or password");
-				return View(model);
+				if (!ModelState.IsValid)
+					return View(model);
+
+				var employee = await _context.Employees
+					.FirstOrDefaultAsync(e => e.Email == model.Email && e.PasswordHash == model.PasswordHash);
+
+				if (employee == null)
+				{
+					ModelState.AddModelError("", "Invalid email or password");
+					return View(model);
+				}
+
+
+				HttpContext.Session.SetString("UserLoggedIn", "true");
+				HttpContext.Session.SetInt32("EmployeeID", employee.Id);
+				HttpContext.Session.SetString("EmployeeName", employee.Name ?? "");
+				HttpContext.Session.SetString("EmployeeEmail", employee.Email ?? "");
+				HttpContext.Session.SetString("EmployeeImage", employee.ImagePath ?? "");
+				HttpContext.Session.SetString("EmployeeAddress", employee.Address ?? "");
+				HttpContext.Session.SetString("EmployeePosition", employee.Position ?? "");
+
+				if (employee.ManagerId.HasValue)
+					HttpContext.Session.SetInt32("ManagerID", employee.ManagerId.Value);
+
+				if (employee.DepartmentId.HasValue)
+					HttpContext.Session.SetInt32("DepartmentID", employee.DepartmentId.Value);
+
+				return RedirectToAction("Index", "EmployeeAttend");
+				//return Json(new { success = true, message = $"You are connected. Your Local IP: {userIp}" });
 			}
 
-
-			HttpContext.Session.SetString("UserLoggedIn", "true");
-			HttpContext.Session.SetInt32("EmployeeID", employee.Id);
-			HttpContext.Session.SetString("EmployeeName", employee.Name ?? "");
-			HttpContext.Session.SetString("EmployeeEmail", employee.Email ?? "");
-			HttpContext.Session.SetString("EmployeeImage", employee.ImagePath ?? "");
-			HttpContext.Session.SetString("EmployeeAddress", employee.Address ?? "");
-			HttpContext.Session.SetString("EmployeePosition", employee.Position ?? "");
-
-			if (employee.ManagerId.HasValue)
-				HttpContext.Session.SetInt32("ManagerID", employee.ManagerId.Value);
-
-			if (employee.DepartmentId.HasValue)
-				HttpContext.Session.SetInt32("DepartmentID", employee.DepartmentId.Value);
-
-			return RedirectToAction("Index", "EmployeeAttend");
+			return Json(new { success = false, message = $"You are NOT on the company network! Your Local IP: {userIp}" });
 		}
+		//[HttpPost]
+		//public async Task<IActionResult> EmployeeLogin(Employee model)
+		//{
+		//	if (!ModelState.IsValid)
+		//		return View(model);
+
+		//	var employee = await _context.Employees
+		//		.FirstOrDefaultAsync(e => e.Email == model.Email && e.PasswordHash == model.PasswordHash);
+
+		//	if (employee == null)
+		//	{
+		//		ModelState.AddModelError("", "Invalid email or password");
+		//		return View(model);
+		//	}
+
+
+		//	HttpContext.Session.SetString("UserLoggedIn", "true");
+		//	HttpContext.Session.SetInt32("EmployeeID", employee.Id);
+		//	HttpContext.Session.SetString("EmployeeName", employee.Name ?? "");
+		//	HttpContext.Session.SetString("EmployeeEmail", employee.Email ?? "");
+		//	HttpContext.Session.SetString("EmployeeImage", employee.ImagePath ?? "");
+		//	HttpContext.Session.SetString("EmployeeAddress", employee.Address ?? "");
+		//	HttpContext.Session.SetString("EmployeePosition", employee.Position ?? "");
+
+		//	if (employee.ManagerId.HasValue)
+		//		HttpContext.Session.SetInt32("ManagerID", employee.ManagerId.Value);
+
+		//	if (employee.DepartmentId.HasValue)
+		//		HttpContext.Session.SetInt32("DepartmentID", employee.DepartmentId.Value);
+
+		//	return RedirectToAction("Index", "EmployeeAttend");
+		//}
 
 		public IActionResult Logout()
 		{

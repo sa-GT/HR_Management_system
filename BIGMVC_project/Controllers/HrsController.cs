@@ -170,24 +170,24 @@ namespace HR_Management.Controllers
 			await _context.SaveChangesAsync();
 
 			// Redirect to a confirmation page or show success
-			return RedirectToAction("ManagerDetails", new { id = model.Id }); // Adjust to a relevant action
+			return RedirectToAction("AddManager", new { id = model.Id }); // Adjust to a relevant action
 		}
 
 		// GET: Hrs/ManagerDetails/5
-		[HttpGet("manager/details/{id}")]
-		public IActionResult ManagerDetails(int id)
-		{
-			var manager = _context.Managers
-				.Include(m => m.Department)
-				.FirstOrDefault(m => m.Id == id);
+		//[HttpGet("manager/details/{id}")]
+		//public IActionResult ManagerDetails(int id)
+		//{
+		//	var manager = _context.Managers
+		//		.Include(m => m.Department)
+		//		.FirstOrDefault(m => m.Id == id);
 
-			if (manager == null)
-			{
-				return NotFound();
-			}
+		//	if (manager == null)
+		//	{
+		//		return NotFound();
+		//	}
 
-			return View(manager);
-		}
+		//	return View(manager);
+		//}
 		public IActionResult ExportLeaveRequestsToPDF()
 		{
 			var leaveRequests = _context.LeaveRequests.ToList();
@@ -321,6 +321,7 @@ namespace HR_Management.Controllers
 
 		public async Task<IActionResult> Department()
 		{
+
 			return View(await _context.Departments.ToListAsync());
 		}
 

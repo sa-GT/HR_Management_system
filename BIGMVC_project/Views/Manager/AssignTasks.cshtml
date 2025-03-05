@@ -9,11 +9,11 @@
 }
 
 <h2>Assign Task to @employee</h2> 
-<a asp-action="Show_Employee" asp-controller="Manager">Back_to_list</a>
+<a h asp-action="Show_Employee" asp-controller="Manager">Back_to_list</a>
 
 
 <form asp-controller="Manager" asp-action="CreateTask" method="post">
-    <input type="hidden" name="EmployeeId" value="@employeeid" />
+    <input hidden name="Employeeid" asp-route-id="Employeeid" value="@employeeid" />
 
     <div class="form-group">
         <label for="TaskName">Employee Name</label>

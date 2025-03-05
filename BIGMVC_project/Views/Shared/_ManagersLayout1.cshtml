@@ -50,6 +50,12 @@
 				</div>
 				<ul class="nav">
 					<li>
+						<a class="nav-link" asp-action="Show_Employee" asp-controller="Manager">
+							<i class="fa fa-user"></i>
+							<p>Employee_data</p>
+						</a>
+					</li>
+					<li>
 						<a class="nav-link" href="@Url.Action("Addemployee", "Manager")">
 							<i class="fa fa-user"></i>
 							<p>Add Employee</p>
@@ -61,12 +67,6 @@
 							<p>
 								Time-Off Request
 							</p>
-						</a>
-					</li>
-					<li>
-						<a class="nav-link" asp-action="Show_Employee" asp-controller="Manager">
-							<i class="fa fa-user"></i>
-							<p>Employee_data</p>
 						</a>
 					</li>
 					<li>

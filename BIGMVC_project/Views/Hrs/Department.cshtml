@@ -3,11 +3,9 @@
 }
 @model IEnumerable<Department>
 <h1 style="color:black;">Department</h1>
-
-<hr />
-<a asp-action="AddManager" class="btn btn-primary">Create New</a>
+<hr/>
+<a asp-action="DepartmentCreate" class="btn btn-primary">Create New</a>
 <a asp-action="ManagerToPDF" asp-controller="Hrs" class="btn btn-primary">Download PDF</a>
-
 <div class="card-container">
 	@foreach (var item in Model)
 	{
@@ -22,7 +20,6 @@
 		</div>
 	}
 </div>
-
 <script>
 	function toggleCard(card) {
 		card.classList.toggle('expanded');
@@ -34,3 +31,4 @@
 		}
 	}
 </script>
+

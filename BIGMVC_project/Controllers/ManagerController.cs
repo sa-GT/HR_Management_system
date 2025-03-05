@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BIGMVC_project.Controllers
 {
@@ -58,17 +59,29 @@ namespace BIGMVC_project.Controllers
 		}
 		public IActionResult Addemployee()
 		{
+			ViewBag.depname = _context.Departments.Select(e => new { e.Id, e.Name }).ToList();
 			return View();
 		}
 		[HttpPost]
+		//[ValidateAntiForgeryToken]
 		public IActionResult Addemployee(Employee employees)
 		{
+			var findd = _context.Employees.FirstOrDefault(m => m.Email == employees.Email);
+			if (findd != null)
+			{
+				ViewBag.errors = "This Employee is already Exist";
+				return View();
+			}
+			//var con = _context.Departments.Where(m => m.Id == employees.DepartmentId).ToList();
+			//HttpContext.Session.SetInt32("iddep", );
 			if (ModelState.IsValid)
 			{
+				employees.ImagePath = "https://i.pinimg.com/474x/ad/4d/39/ad4d39691e21a7d805eaca3b90ab8554.jpg";
 				_context.Add(employees);
 				_context.SaveChanges();
 				return View(); //RedirectToAction("Index")
 			}
+			//ViewBag.depname = _context.Departments.Select(e => new { e.Id, e.Name }).ToList();
 			return View();
 		}
 		[HttpGet]
@@ -81,6 +94,8 @@ namespace BIGMVC_project.Controllers
 		public IActionResult LeavingR(int id, string status)
 		{
 			var findd = _context.LeaveRequests.Find(id);
+			var condd = _context.Employees.Where(m => m.Id == id);
+			//var findemp = _context.Employees.Find(findd.Id);
 			if (findd != null)
 			{
 				findd.LeaveRequestsStatusEnum = status;
@@ -177,7 +192,7 @@ namespace BIGMVC_project.Controllers
 		}
 		public IActionResult AssignTasks(int id, int a)
 		{
-
+			HttpContext.Session.SetInt32("idempNew", id);
 
 			HttpContext.Session.SetString("EmployeeName", _context.Employees.FirstOrDefault(x => x.Id == id).Name);
 			return View();
@@ -201,21 +216,23 @@ namespace BIGMVC_project.Controllers
 
 
 		[HttpPost]
-		public IActionResult CreateTask(Mission task, int EmployeeId)
+		public IActionResult CreateTask(Mission task, int Employeeid)
 		{
-			var employee = _context.Employees.FirstOrDefault(e => e.Id == EmployeeId);
+		
+			var employee = _context.Employees.FirstOrDefault(e => e.Id == Convert.ToInt32(HttpContext.Session.GetInt32("idempNew")));
 
 			if (employee == null)
 			{
 				ModelState.AddModelError("", "Invalid EmployeeId.");
 				return View("AssignTasks");
 			}
+			
 
-			task.EmployeeId = EmployeeId;  // تعيين EmployeeId للمهمة
+			task.EmployeeId = Convert.ToInt32(HttpContext.Session.GetInt32("idempNew")); ;  // تعيين EmployeeId للمهمة
 			_context.Add(task);
 			_context.SaveChanges();
 
-			return RedirectToAction("Index");
+			return RedirectToAction("Show_Employee", "Manager" ) ;
 		}
 
 
@@ -315,7 +332,14 @@ namespace BIGMVC_project.Controllers
 			HttpContext.Session.Clear();
 			return RedirectToAction("Index", "Login");
 		}
-
+		public IActionResult ContactUs()
+		{
+			return View();
+		}
+		public IActionResult Services()
+		{
+			return View();
+		}
 	}
 
 
