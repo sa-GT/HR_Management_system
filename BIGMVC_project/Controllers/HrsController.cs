@@ -27,12 +27,35 @@ namespace HR_Management.Controllers
 		}
 		public IActionResult Dashboard()
 		{
-			// إجمالي الموظفين
-			//ViewBag.TotalEmployees = _context.Employees.Count();
 
+			var totalHR = _context.Hrs.Count();
+			var totalEmployees = _context.Employees.Count();
+			var totalManagers = _context.Managers.Count();
+			var totalDepartments = _context.Departments.Count();
+			var tasks = _context.Missions.Include(m => m.Employee).ToList();
+
+			ViewBag.Tasks = tasks;
+			ViewBag.TotalTasks = tasks.Count();
+			ViewBag.TotalHR = totalHR;
+			ViewBag.TotalEmployees = totalEmployees;
+			ViewBag.TotalManagers = totalManagers;
+			ViewBag.TotalDepartments = totalDepartments;
+
+			var departmentEmployeeCount = _context.Employees
+				.GroupBy(e => e.Department.Name)
+				.Select(group => new
+				{
+					DepartmentName = group.Key,
+					EmployeeCount = group.Count()
+				})
+				.ToList();
+
+			ViewBag.DepartmentEmployeeCount = departmentEmployeeCount;
 
 			return View();
 		}
+
+
 
 
 		public IActionResult LeaveRequests()
@@ -127,6 +150,7 @@ namespace HR_Management.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddManager(Manager model, IFormFile profilePicture)
 		{
+			// Check if email is already taken
 			if (_context.Managers.Any(m => m.Email == model.Email))
 			{
 				ModelState.AddModelError("Email", "This email is already in use.");
@@ -139,6 +163,7 @@ namespace HR_Management.Controllers
 				return View(model); // Return the view with validation errors if the model is invalid
 			}
 
+			// Handle profile picture upload
 			if (profilePicture != null && profilePicture.Length > 0)
 			{
 				var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
@@ -149,8 +174,10 @@ namespace HR_Management.Controllers
 					return View(model);
 				}
 
-				var fileName = Path.GetFileName(profilePicture.FileName);
-				var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "managers", fileName);
+				// Clean the filename to avoid invalid characters
+				var fileName = Path.GetFileNameWithoutExtension(profilePicture.FileName);
+				var cleanedFileName = Path.Combine(fileName + fileExtension); // Add extension back
+				var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "managers", cleanedFileName);
 				var directoryPath = Path.GetDirectoryName(filePath);
 
 				if (!Directory.Exists(directoryPath))
@@ -163,31 +190,32 @@ namespace HR_Management.Controllers
 					await profilePicture.CopyToAsync(stream);
 				}
 
-				model.Image = fileName;
+				model.Image = cleanedFileName;
 			}
 
+			// Add the manager to the context
 			_context.Managers.Add(model);
 			await _context.SaveChangesAsync();
 
-			// Redirect to a confirmation page or show success
-			return RedirectToAction("AddManager", new { id = model.Id }); // Adjust to a relevant action
+			// Redirect to a relevant action (for example, the details page of the new manager)
+			return RedirectToAction("ManagerDetails", new { id = model.Id });
 		}
 
 		// GET: Hrs/ManagerDetails/5
-		//[HttpGet("manager/details/{id}")]
-		//public IActionResult ManagerDetails(int id)
-		//{
-		//	var manager = _context.Managers
-		//		.Include(m => m.Department)
-		//		.FirstOrDefault(m => m.Id == id);
+		[HttpGet("manager/details/{id}")]
+		public IActionResult ManagerDetails(int id)
+		{
+			var manager = _context.Managers
+				.Include(m => m.Department)
+				.FirstOrDefault(m => m.Id == id);
 
-		//	if (manager == null)
-		//	{
-		//		return NotFound();
-		//	}
+			if (manager == null)
+			{
+				return NotFound();
+			}
 
-		//	return View(manager);
-		//}
+			return RedirectToAction("Manager");
+		}
 		public IActionResult ExportLeaveRequestsToPDF()
 		{
 			var leaveRequests = _context.LeaveRequests.ToList();
@@ -267,17 +295,141 @@ namespace HR_Management.Controllers
 			return View(hr);
 		}
 
+		// GET: Hrs/Create
+		public IActionResult Create()
+		{
+			return View();
+		}
 
+		// POST: Hrs/Create
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Create([Bind("Name,Email,PasswordHash,Image")] Hr hr)
+		{
+			if (ModelState.IsValid)
+			{
+				_context.Add(hr);
+				await _context.SaveChangesAsync();
+				return RedirectToAction(nameof(Index));
+			}
+			return View(hr);
+		}
 
+		// GET: Hrs/Edit/5
+		public async Task<IActionResult> Edit(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 
+			var hr = await _context.Hrs.FindAsync(id);
+			if (hr == null)
+			{
+				return NotFound();
+			}
+			return View(hr);
+		}
+
+		// POST: Hrs/Edit/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,PasswordHash,Image")] Hr hr)
+		{
+			if (id != hr.Id)
+			{
+				return NotFound();
+			}
+
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					_context.Update(hr);
+					await _context.SaveChangesAsync();
+				}
+				catch (DbUpdateConcurrencyException)
+				{
+					if (!HrExists(hr.Id))
+					{
+						return NotFound();
+					}
+					else
+					{
+						throw;
+					}
+				}
+				return RedirectToAction(nameof(Index));
+			}
+			return View(hr);
+		}
+
+		// GET: Hrs/Delete/5
+		// GET: Hrs/Delete/5
+		public async Task<IActionResult> Delete(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
+
+			var hr = await _context.Hrs
+				.FirstOrDefaultAsync(m => m.Id == id);
+			if (hr == null)
+			{
+				return NotFound();
+			}
+
+			return View(hr);
+		}
+
+		// GET: Hrs/Create
+		public IActionResult Createe()
+		{
+			return View(); // This will display the Create.cshtml form
+		}
+
+		// POST: Hrs/Create
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Createe([Bind("Name,Email,PasswordHash,Image")] Hr hr)
+		{
+			if (ModelState.IsValid)
+			{
+				_context.Add(hr);
+				await _context.SaveChangesAsync();
+				return RedirectToAction(nameof(Index)); // Redirect to HR list after creation
+			}
+			return View(hr); // Re-display form with validation errors
+		}
+
+		// POST: Hrs/Delete/5
+		[HttpPost, ActionName("Delete")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteConfirmed(int id)
+		{
+			var hr = await _context.Hrs.FindAsync(id);
+			if (hr != null)
+			{
+				_context.Hrs.Remove(hr);
+			}
+
+			await _context.SaveChangesAsync();
+			return RedirectToAction(nameof(Index));
+		}
+
+		private bool HrExists(int id)
+		{
+			return _context.Hrs.Any(e => e.Id == id);
+		}
+
+		// Export HR data to PDF
 		public IActionResult ExportHRToPDF()
 		{
 			var HR = _context.Hrs.ToList();
-
 			var pdfStream = new MemoryStream();
 			var document = new Document(PageSize.A4);
 			var writer = PdfWriter.GetInstance(document, pdfStream);
-
 			document.Open();
 
 			var font = FontFactory.GetFont("Arial", 20, Font.BOLD);
@@ -285,16 +437,13 @@ namespace HR_Management.Controllers
 			{
 				Alignment = Element.ALIGN_CENTER
 			};
-
 			title.SpacingAfter = 20f;
-
 			document.Add(title);
 			document.Add(new Paragraph(" "));
 
-			var table = new PdfPTable(3) { WidthPercentage = 100 }; // خليتها 3 لأنك بتعرض (ID - Name - Email)
+			var table = new PdfPTable(3) { WidthPercentage = 100 };
 			table.SpacingBefore = 20f;
 
-			// Header
 			table.AddCell("ID");
 			table.AddCell("Name");
 			table.AddCell("Email");
@@ -308,8 +457,6 @@ namespace HR_Management.Controllers
 
 			document.Add(table);
 			document.Close();
-
-			// هنا إعادة تعيين Position بتاعة MemoryStream 🔥
 			pdfStream.Position = 0;
 
 			return File(pdfStream.ToArray(), "application/pdf", "HRteam.pdf");
@@ -321,7 +468,6 @@ namespace HR_Management.Controllers
 
 		public async Task<IActionResult> Department()
 		{
-
 			return View(await _context.Departments.ToListAsync());
 		}
 
@@ -386,7 +532,7 @@ namespace HR_Management.Controllers
 			document.Add(title);
 			document.Add(new Paragraph(" "));
 
-			var table = new PdfPTable(3) { WidthPercentage = 100 }; // خليتها 3 لأنك بتعرض (ID - Name - Email)
+			var table = new PdfPTable(3) { WidthPercentage = 100 };
 			table.SpacingBefore = 20f;
 
 			// Header
@@ -404,7 +550,6 @@ namespace HR_Management.Controllers
 			document.Add(table);
 			document.Close();
 
-			// هنا إعادة تعيين Position بتاعة MemoryStream 🔥
 			pdfStream.Position = 0;
 
 			return File(pdfStream.ToArray(), "application/pdf", "Departments.pdf");
@@ -413,41 +558,212 @@ namespace HR_Management.Controllers
 
 
 
-		// GET: Employees/View
+		// GET: Employees
 		public async Task<IActionResult> Employee()
 		{
-			var myDbContext = _context.Employees.Include(e => e.Department).Include(e => e.Manager);
-			return View(await myDbContext.ToListAsync());
+			var employees = await _context.Employees
+							   .Include(e => e.Department)
+							   .Include(e => e.Manager) // Include Manager
+							   .ToListAsync();
+
+			return View(employees);
 		}
 
+
 		// GET: Employees/Details/5
-		public async Task<IActionResult> EmployeeDetails(int? id)
+		//public async Task<IActionResult> EmployeeDetails(int? id)
+		//{
+		//    if (id == null)
+		//    {
+		//        return NotFound();
+		//    }
+
+		//    var employee = await _context.Employees
+		//                                 .Include(e => e.Department)
+		//                                 .FirstOrDefaultAsync(m => m.Id == id);
+
+		//    if (employee == null)
+		//    {
+		//        return NotFound();
+		//    }
+
+		//    return View(employee);
+		//}
+
+		//public IActionResult EmployeeCreate()
+		//{
+		//    ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "Name");
+
+		//    return View();
+		//}
+
+		//[HttpPost]
+		//[ValidateAntiForgeryToken]
+		//public async Task<IActionResult> EmployeeCreate([Bind("Id,Name,Email,PasswordHash,Address,Position,DepartmentId,ImagePath")] Employee employee)
+		//{
+		//    if (ModelState.IsValid)
+		//    {
+		//        // Check if the email already exists
+		//        bool emailExists = await _context.Employees.AnyAsync(e => e.Email == employee.Email);
+		//        if (emailExists)
+		//        {
+		//            ModelState.AddModelError("Email", "The email is already in use. Please use a different email.");
+		//            return View(employee);
+		//        }
+
+		//        _context.Add(employee);
+		//        await _context.SaveChangesAsync();
+		//        return RedirectToAction(nameof(Employee));
+		//    }
+
+		//    // Get departments to populate the dropdown
+		//    ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "Name", employee.DepartmentId);
+
+		//    return View(employee);
+		//}
+
+		// GET: Employees/Edit/5
+		// GET: Employees/Edit/5
+		public async Task<IActionResult> EmployeeEdit(int? id)
 		{
 			if (id == null)
 			{
 				return NotFound();
 			}
 
-			var employee = await _context.Employees
-				.Include(e => e.Department)
-				.Include(e => e.Manager)
-				.FirstOrDefaultAsync(m => m.Id == id);
+			var employee = await _context.Employees.FindAsync(id);
 			if (employee == null)
 			{
 				return NotFound();
 			}
 
-			return View(employee);
+			// Populate the Department and Manager dropdowns
+			ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "Name", employee.DepartmentId);
+			ViewBag.ManagerId = new SelectList(_context.Employees.Where(e => e.Id != employee.Id), "Id", "Name", employee.ManagerId);
+
+			return View(employee);  // Return the employee model to the view
+		}
+
+		//[HttpPost]
+		//[ValidateAntiForgeryToken]
+		//public async Task<IActionResult> EmployeeEdit(int id, Employee employee)
+		//{
+		//	if (id != employee.Id)
+		//	{
+		//		return NotFound();
+		//	}
+
+		//	// Ensure the ManagerId exists in the database
+		//	var managerExists = await _context.Employees.AnyAsync(e => e.Id == employee.ManagerId);
+		//	//if (employee.ManagerId.HasValue && !managerExists)
+		//	//{
+		//	//	ModelState.AddModelError("ManagerId", "The selected manager does not exist.");
+		//	//	// Populate the Department and Manager dropdowns again in case of validation errors
+		//	//	ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "Name", employee.DepartmentId);
+		//	//	ViewBag.ManagerId = new SelectList(_context.Employees.Where(e => e.Id != employee.Id), "Id", "Name", employee.ManagerId);
+		//	//	return View(employee);  // Return the form with validation error
+		//	//
+		//	//}
+		//	if (ModelState.IsValid)
+		//	{
+		//		try
+		//		{
+		//			//employee.Id = 0;
+		//			// Update the employee data
+		//			_context.Update(employee);
+		//			await _context.SaveChangesAsync();  // Save the changes to the database
+		//		}
+		//		catch (DbUpdateConcurrencyException)
+		//		{
+		//			if (!EmployeeExists(employee.Id))
+		//			{
+		//				return NotFound();
+		//			}
+		//			else
+		//			{
+		//				throw;
+		//			}
+		//		}
+
+		//		// Redirect to the employee listing page after successful update
+		//		return RedirectToAction(nameof(Employee));
+		//	}
+
+		//	// Populate the Department and Manager dropdowns again in case of validation errors
+		//	ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "Name", employee.DepartmentId);
+		//	ViewBag.ManagerId = new SelectList(_context.Employees.Where(e => e.Id != employee.Id), "Id", "Name", employee.ManagerId);
+
+		//	return View(employee);  // Return to the view with validation errors
+		//}
+
+
+
+		private bool EmployeeExists(int id)
+		{
+			return _context.Employees.Any(e => e.Id == id);
 		}
 
 
 
+		// GET: Manager/Delete/5
+		public async Task<IActionResult> ManagerDelete(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
+
+			var manager = await _context.Managers
+										 .Include(m => m.Department)
+										 .Include(m => m.Employees) // Optional: Include employees if you want to show them
+										 .FirstOrDefaultAsync(m => m.Id == id);
+
+			if (manager == null)
+			{
+				return NotFound();
+			}
+
+			return View(manager); // You can show the manager's details to confirm deletion
+		}
+
+		// POST: Manager/Delete/5
+		[HttpPost, ActionName("ManagerDelete")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ManagerDeleteConfirmed(int id)
+		{
+			var manager = await _context.Managers
+										 .Include(m => m.Evaluations)
+										 .FirstOrDefaultAsync(m => m.Id == id);
+
+			if (manager == null)
+			{
+				return NotFound();
+			}
+
+			_context.Evaluations.RemoveRange(manager.Evaluations);
+
+			foreach (var employee in manager.Employees)
+			{
+				employee.ManagerId = null;
+				_context.Employees.Update(employee);
+			}
+
+			_context.Managers.Remove(manager);
+
+			await _context.SaveChangesAsync();
+
+			return RedirectToAction(nameof(Manager));
+		}
+
+
+
+		// Employee to PDF
 		public IActionResult EmployeeToPDF()
 		{
 			var employees = _context.Employees
-				.Include(e => e.Department)  // تضمين القسم
-				.Include(e => e.Manager)     // تضمين المدير
-			.ToList();
+									.Include(e => e.Department)
+									.Include(e => e.Manager)
+									.ToList();
 
 			var pdfStream = new MemoryStream();
 			var document = new Document(PageSize.A4);
@@ -466,7 +782,7 @@ namespace HR_Management.Controllers
 			document.Add(title);
 			document.Add(new Paragraph(" "));
 
-			var table = new PdfPTable(6) { WidthPercentage = 100 }; // تعديل هنا لجعلها 7 أعمدة
+			var table = new PdfPTable(6) { WidthPercentage = 100 };
 			table.SpacingBefore = 20f;
 
 			// Header
@@ -490,45 +806,15 @@ namespace HR_Management.Controllers
 			document.Add(table);
 			document.Close();
 
-			// إعادة تعيين Position بتاعة MemoryStream
 			pdfStream.Position = 0;
 
 			return File(pdfStream.ToArray(), "application/pdf", "Employees.pdf");
 		}
 
-
-
-		// GET: Employees/Create
-		public IActionResult EmployeeCreate()
-		{
-			// جلب قائمة الأقسام وتمريرها إلى ViewBag
-			ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "Name");
-
-			// جلب قائمة المديرين وتمريرها إلى ViewBag (إذا كان هناك مديرون)
-			ViewBag.ManagerId = new SelectList(_context.Employees, "Id", "Name");
-
-			return View();
-		}
-
-
-
-		// POST: Employees/Create
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> EmployeeCreate([Bind("Id,Name,Email,PasswordHash,ImagePath,Address,Position,ManagerId,DepartmentId")] Employee employee)
-		{
-			if (ModelState.IsValid)
-			{
-				_context.Add(employee);
-				await _context.SaveChangesAsync();
-				return RedirectToAction(nameof(Employee));
-			}
-			ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Id", employee.DepartmentId);
-			ViewData["ManagerId"] = new SelectList(_context.Managers, "Id", "Id", employee.ManagerId);
-			return View(employee);
-		}
+		//private bool EmployeeExists(int id)
+		//{
+		//    return _context.Employees.Any(e => e.Id == id);
+		//}
 
 
 
@@ -543,7 +829,7 @@ namespace HR_Management.Controllers
 		public IActionResult ManagerToPDF()
 		{
 			var managers = _context.Managers
-				.Include(m => m.Department)  // تضمين القسم المرتبط بكل مدير
+				.Include(m => m.Department)
 			.ToList();
 
 			var pdfStream = new MemoryStream();
@@ -563,7 +849,7 @@ namespace HR_Management.Controllers
 			document.Add(title);
 			document.Add(new Paragraph(" "));
 
-			var table = new PdfPTable(3) { WidthPercentage = 100 }; // نعدل هنا لأننا نعرض 3 أعمدة
+			var table = new PdfPTable(3) { WidthPercentage = 100 };
 			table.SpacingBefore = 20f;
 
 			// Header
@@ -575,7 +861,7 @@ namespace HR_Management.Controllers
 			{
 				table.AddCell(manager.Name ?? "N/A");
 				table.AddCell(manager.Email ?? "N/A");
-				table.AddCell(manager.Department?.Name ?? "N/A");  // عرض اسم القسم إذا كان موجودًا
+				table.AddCell(manager.Department?.Name ?? "N/A");
 			}
 
 			document.Add(table);
@@ -636,9 +922,18 @@ namespace HR_Management.Controllers
 		// GET: Evaluations
 		public async Task<IActionResult> Evaluation()
 		{
-			var myDbContext = _context.Evaluations.Include(e => e.Employee).Include(e => e.Manager);
-			return View(await myDbContext.ToListAsync());
+			// تحميل قائمة التقييمات من قاعدة البيانات مع ربط الموظف والمدير
+			var evaluations = await _context.Evaluations
+				.Include(e => e.Employee)  // ربط التقييم مع الموظف
+				.Include(e => e.Manager)   // ربط التقييم مع المدير
+				.ToListAsync();
+
+			// تمرير التقييمات إلى الـ View
+			return View(evaluations);
 		}
+
+
+
 
 		// GET: Evaluations/Details/5
 		public async Task<IActionResult> EvaluationDetails(int? id)
@@ -659,12 +954,84 @@ namespace HR_Management.Controllers
 
 			return View(evaluation);
 		}
+		// GET: Managers/Edit/5
+		public async Task<IActionResult> ManagerEdit(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
+
+			var manager = await _context.Managers.FindAsync(id);
+			if (manager == null)
+			{
+				return NotFound();
+			}
+
+			ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", manager.DepartmentId);
+			return View(manager);
+		}
+
+		// POST: Managers/Edit/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ManagerEdit(int id, [Bind("Id,Name,Email,PasswordHash,DepartmentId,Image")] Manager manager)
+		{
+			if (id != manager.Id)
+			{
+				return NotFound();
+			}
+
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					_context.Update(manager);
+					await _context.SaveChangesAsync();
+				}
+				catch (DbUpdateConcurrencyException)
+				{
+					if (!_context.Managers.Any(e => e.Id == manager.Id))
+					{
+						return NotFound();
+					}
+					else
+					{
+						throw;
+					}
+				}
+				return RedirectToAction(nameof(Manager));
+			}
+
+			ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", manager.DepartmentId);
+			return View(manager);
+		}
+
+		//// GET: Managers/Delete/5
+		//[ValidateAntiForgeryToken]
+		//[HttpPost, ActionName("ManagerDelete")]
+		//public async Task<IActionResult> ManagerDeleteConfirmed(int id)
+		//{
+		//    var manager = await _context.Managers.FindAsync(id);
+		//    if (manager != null)
+		//    {
+		//        // حذف التقييمات المرتبطة بالمدير
+		//        var evaluations = _context.Evaluations.Where(e => e.Id == id);
+		//        _context.Evaluations.RemoveRange(evaluations);
+
+		//        // حذف المدير نفسه
+		//        _context.Managers.Remove(manager);
+		//        await _context.SaveChangesAsync();
+		//    }
+
+		//    return RedirectToAction(nameof(Manager));
+		//}
 
 		public IActionResult EvaluationToPDF()
 		{
 			var evaluations = _context.Evaluations
-				.Include(e => e.Employee)  // تضمين الموظف المرتبط بالتقييم
-				.Include(e => e.Manager)   // تضمين المدير المرتبط بالتقييم
+				.Include(e => e.Employee)
+				.Include(e => e.Manager)
 			.ToList();
 
 			var pdfStream = new MemoryStream();
@@ -684,7 +1051,7 @@ namespace HR_Management.Controllers
 			document.Add(title);
 			document.Add(new Paragraph(" "));
 
-			var table = new PdfPTable(5) { WidthPercentage = 100 }; // 6 أعمدة: ID - Employee Name - Manager Name - Evaluation Date - Rating - Comments
+			var table = new PdfPTable(5) { WidthPercentage = 100 };
 			table.SpacingBefore = 20f;
 
 			// Header
@@ -696,11 +1063,11 @@ namespace HR_Management.Controllers
 
 			foreach (var evaluation in evaluations)
 			{
-				table.AddCell(evaluation.Employee?.Name ?? "N/A");  // اسم الموظف
-				table.AddCell(evaluation.Manager?.Name ?? "N/A");   // اسم المدير
-				table.AddCell(evaluation.DateEvaluated?.ToString("yyyy-MM-dd") ?? "N/A");  // تاريخ التقييم
-				table.AddCell(evaluation.EvaluationsStatusEnum.ToString() ?? "N/A");  // تقييم
-				table.AddCell(evaluation.Comments ?? "N/A");  // التعليقات (إذا كانت موجودة)
+				table.AddCell(evaluation.Employee?.Name ?? "N/A");
+				table.AddCell(evaluation.Manager?.Name ?? "N/A");
+				table.AddCell(evaluation.DateEvaluated?.ToString("yyyy-MM-dd") ?? "N/A");
+				table.AddCell(evaluation.EvaluationsStatusEnum.ToString() ?? "N/A");
+				table.AddCell(evaluation.Comments ?? "N/A");
 			}
 
 			document.Add(table);
@@ -711,10 +1078,7 @@ namespace HR_Management.Controllers
 
 			return File(pdfStream.ToArray(), "application/pdf", "Evaluations.pdf");
 		}
-		private bool HrExists(int id)
-		{
-			return _context.Hrs.Any(e => e.Id == id);
-		}
+
 	}
 }
 

@@ -5,65 +5,61 @@
         background-color: white;
     }
 
-    .card {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin: 10px;
-        padding: 15px;
-        cursor: pointer;
-        transition: box-shadow 0.3s ease;
+    .table th, .table td {
+        vertical-align: middle;
+        text-align: center;
     }
 
-        .card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .card.expanded {
-            background-color: #f9f9f9;
-        }
-
-    .card-header {
-        font-weight: bold;
-        font-size: 18px;
-    }
-
-    .card-details {
-        display: none;
-        margin-top: 10px;
-    }
-
-    .card.expanded .card-details {
-        display: block;
+    .manager-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
     }
 </style>
 
 <h1 style="color:black;">Managers List</h1>
 
-
-
 <hr />
 <a asp-action="AddManager" class="btn btn-primary">Create New</a>
 <a asp-action="ManagerToPDF" asp-controller="Hrs" class="btn btn-primary">Download PDF</a>
 
-<div class="card-container">
-    @foreach (var item in Model)
-    {
-        <div class="card" onclick="toggleCard(this)">
-            <div class="card-header">
-                @Html.DisplayFor(modelItem => item.Name)
-            </div>
-            <div class="card-details">
-                <p><strong>Email:</strong> @Html.DisplayFor(modelItem => item.Email)</p>
-                <p><strong>Department:</strong> @Html.DisplayFor(modelItem => item.Department.Name)</p>
-            </div>
-        </div>
-    }
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function toggleCard(card) {
-        $(card).find('.card-details').slideToggle(300);
-        card.classList.toggle('expanded');
-    }
-</script>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Actions</th> 
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item?.Id</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item?.Image))
+                    {
+                        <img src="~/images/managers/@item.Image" class="manager-image" alt="Manager Image" />
+                    }
+                    else
+                    {
+                        <p>No image available</p>
+                    }
+                </td>
+                <td>@item?.Name</td>
+                <td>@item?.Email</td>
+                <td>@(item?.Department != null ? item.Department.Name : "No Department")</td>
+                <td>
+                    <a asp-action="ManagerEdit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <form asp-action="ManagerDelete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure?');">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

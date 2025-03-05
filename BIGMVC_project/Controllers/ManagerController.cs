@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BIGMVC_project.Controllers
 {
+	//----------------
 	public class ManagerController : Controller
 	{
 		private readonly MyDbContext _context;
