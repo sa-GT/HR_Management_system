@@ -31,28 +31,25 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<Manager> Managers { get; set; }
 
-    public virtual DbSet<Mission> Missions { get; set; }
+    public virtual DbSet<Task> Tasks { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=LAPTOP-6263BV65;Database=MVC_Project;Trusted_Connection=True;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-3UUB6RH; Database=MVC_Project; Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Attendance>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Attendan__3214EC2775A8B4C3");
+            entity.HasKey(e => e.Id).HasName("PK__Attendan__3214EC270663B3F0");
 
             entity.ToTable("Attendance");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
             entity.Property(e => e.PunchIn).HasColumnType("datetime");
             entity.Property(e => e.PunchOut).HasColumnType("datetime");
-            entity.Property(e => e.WorkingHours)
-                .HasColumnType("datetime")
-                .HasColumnName("working_hours");
+            entity.Property(e => e.WorkingHours).HasColumnType("datetime");
 
             entity.HasOne(d => d.Employee).WithMany(p => p.Attendances)
                 .HasForeignKey(d => d.EmployeeId)
@@ -61,7 +58,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Department>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Departme__3214EC27ABBBED79");
+            entity.HasKey(e => e.Id).HasName("PK__Departme__3214EC27EF91D096");
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Description)
@@ -74,9 +71,9 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Employee>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Employee__3214EC2708DD0F7C");
+            entity.HasKey(e => e.Id).HasName("PK__Employee__3214EC27BB5E5A0A");
 
-            entity.HasIndex(e => e.Email, "UQ__Employee__A9D10534EB368BCC").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Employee__A9D10534B1D06B66").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Address)
@@ -113,7 +110,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Evaluation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Evaluati__3214EC27902E7910");
+            entity.HasKey(e => e.Id).HasName("PK__Evaluati__3214EC27EE704C0D");
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Comments)
@@ -139,7 +136,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Feedback>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Feedback__3214EC271D957FD5");
+            entity.HasKey(e => e.Id).HasName("PK__Feedback__3214EC271C04505A");
 
             entity.ToTable("Feedback");
 
@@ -151,7 +148,6 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .IsUnicode(false);
-            entity.Property(e => e.ReplyMessage).IsUnicode(false);
             entity.Property(e => e.SubmittedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -159,11 +155,11 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Hr>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__HR__3214EC27BB54F406");
+            entity.HasKey(e => e.Id).HasName("PK__HR__3214EC27C84AFD0F");
 
             entity.ToTable("HR");
 
-            entity.HasIndex(e => e.Email, "UQ__HR__A9D10534B532CF84").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__HR__A9D1053411FB768B").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Email)
@@ -180,7 +176,7 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<LeaveRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__LeaveReq__3214EC2792CF1D02");
+            entity.HasKey(e => e.Id).HasName("PK__LeaveReq__3214EC277A6ADE97");
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
@@ -189,9 +185,7 @@ public partial class MyDbContext : DbContext
                 .IsUnicode(false)
                 .HasDefaultValue("Pending")
                 .HasColumnName("LeaveRequests_Status_enum");
-            entity.Property(e => e.LeaveType)
-                .IsUnicode(false)
-                .HasColumnName("leave_type");
+            entity.Property(e => e.LeaveType).IsUnicode(false);
             entity.Property(e => e.Reason)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -204,9 +198,9 @@ public partial class MyDbContext : DbContext
 
         modelBuilder.Entity<Manager>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Managers__3214EC2727F0EAE8");
+            entity.HasKey(e => e.Id).HasName("PK__Managers__3214EC27222FAA84");
 
-            entity.HasIndex(e => e.Email, "UQ__Managers__A9D105347190DC53").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Managers__A9D1053453EDFAC6").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
@@ -227,11 +221,9 @@ public partial class MyDbContext : DbContext
                 .HasConstraintName("FK__Managers__Depart__3D5E1FD2");
         });
 
-        modelBuilder.Entity<Mission>(entity =>
+        modelBuilder.Entity<Task>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tasks__3214EC273E7CDB6A");
-
-            entity.ToTable("mission");
+            entity.HasKey(e => e.Id).HasName("PK__Tasks__3214EC27B081AF1B");
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
@@ -244,7 +236,7 @@ public partial class MyDbContext : DbContext
                 .HasDefaultValue("To Do")
                 .HasColumnName("Tasks_Status_enum");
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.Missions)
+            entity.HasOne(d => d.Employee).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.EmployeeId)
                 .HasConstraintName("FK__Tasks__EmployeeI__45F365D3");
         });

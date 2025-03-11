@@ -33,5 +33,5 @@ public partial class Employee
 
     public virtual Manager? Manager { get; set; }
 
-    public virtual ICollection<Mission> Missions { get; set; } = new List<Mission>();
+    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 }

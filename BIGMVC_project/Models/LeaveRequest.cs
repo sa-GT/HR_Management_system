@@ -17,13 +17,13 @@ public partial class LeaveRequest
 
     public string? LeaveRequestsStatusEnum { get; set; }
 
-    public string? LeaveType { get; set; }
-
-    public string? RequestName { get; set; }
-
     public TimeOnly? StartTime { get; set; }
 
     public TimeOnly? EndTime { get; set; }
+
+    public string? LeaveType { get; set; }
+
+    public string? RequestName { get; set; }
 
     public virtual Employee Employee { get; set; } = null!;
 }
